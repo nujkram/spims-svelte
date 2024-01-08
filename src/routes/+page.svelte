@@ -80,7 +80,7 @@
 	drawerStore.close();
 </script>
 
-<div class="container h-full mx-auto flex justify-center items-center">
+<div class="container h-full mx-auto flex justify-center items-center md:pr-64 pr-0">
 	<div class="space-y-10 text-center flex flex-col items-center">
 		<h2 class="h2">Welcome to Rage Avenue Co.</h2>
 		<!-- Animated Logo -->
