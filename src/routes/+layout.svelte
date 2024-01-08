@@ -62,7 +62,8 @@
 							<List />
 						</button>
 					{/if}
-					<strong class="text-xl uppercase">RAGE AVENUE CO.</strong>
+					<strong class="text-xl uppercase md:block hidden">RAGE AVENUE CO.</strong>
+					<strong class="text-xl uppercase md:hidden block">RAC</strong>
 				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
