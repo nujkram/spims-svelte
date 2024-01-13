@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { getDrawerStore } from '@skeletonlabs/skeleton';
-	import { Drawer } from '@skeletonlabs/skeleton';
+	import { Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
 	import type { DrawerSettings } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
