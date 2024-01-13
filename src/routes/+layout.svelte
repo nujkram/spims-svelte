@@ -37,7 +37,7 @@
 		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
 		width: 'w-[80px]',
 		rounded: 'rounded-none',
-		position: 'left',
+		position: 'left'
 	};
 
 	const drawerStore = getDrawerStore();
@@ -51,7 +51,7 @@
 	<Sidebar />
 </Drawer>
 <!-- App Shell -->
-<AppShell slotSidebarLeft="w-0 lg:w-64">
+<AppShell slotSidebarLeft="w-0 lg:w-20">
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
 		<AppBar>
@@ -104,5 +104,7 @@
 		{/if}
 	</svelte:fragment>
 	<!-- Page Route Content -->
-	<slot />
+	<div class="px-6 py-4">
+		<slot />
+	</div>
 </AppShell>

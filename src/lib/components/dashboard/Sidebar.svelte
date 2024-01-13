@@ -1,21 +1,24 @@
 <script lang="ts">
-	import { AppRail, AppRailAnchor, AppRailTile } from '@skeletonlabs/skeleton';
-	import { Box, Cart, FileBarGraph, Home, People } from '$lib/components/icons/index';
+	import { AppRail, AppRailTile } from '@skeletonlabs/skeleton';
+	import { Box, Cart, FileBarGraph, Home, People, Tag } from '$lib/components/icons/index';
 	import { goto } from '$app/navigation';
 
 	let currentTile: number = 0;
 
-	// dictionary of urls
 	const urls: any = {
 		0: '/dashboard',
 		1: '/dashboard/orders',
-		2: '/dashboard/inventory',
-        3: '/dashboard/customers',
-        4: '/dashboard/reports'
+		2: '/dashboard/purchase',
+		3: '/dashboard/inventory',
+		4: '/dashboard/customers',
+		5: '/dashboard/reports'
 	};
-	const handleTileClick = () => {
-		goto(urls[currentTile]);
+
+	const handleTileClick = (i: number) => {
+		goto(urls[i]);
 	};
+	$: currentTile && handleTileClick(currentTile);
+	
 </script>
 
 <AppRail>
@@ -24,7 +27,7 @@
 		name="Home"
 		value={0}
 		title="Home"
-		on:click={handleTileClick}
+		on:click={() => handleTileClick(0)}
 	>
 		<svelte:fragment slot="lead">
 			<div class="flex items-center justify-center">
@@ -38,55 +41,69 @@
 		name="Sales Order"
 		value={1}
 		title="Sales Order"
-		on:click={handleTileClick}
+		on:click={() => currentTile + 1}
 	>
 		<svelte:fragment slot="lead">
-            <div class="flex items-center justify-center">
+			<div class="flex items-center justify-center">
 				<Cart />
 			</div>
-        </svelte:fragment>
+		</svelte:fragment>
 		<span>Sales Order</span>
 	</AppRailTile>
 	<AppRailTile
 		bind:group={currentTile}
-		name="Inventory"
+		name="Purchase Order"
 		value={2}
-		title="Inventory"
-		on:click={handleTileClick}
+		title="Purchase Order"
+		on:click={() => currentTile + 1}
 	>
 		<svelte:fragment slot="lead">
-            <div class="flex items-center justify-center">
+			<div class="flex items-center justify-center">
+				<Tag />
+			</div>
+		</svelte:fragment>
+		<span>Purchase Order</span>
+	</AppRailTile>
+	<AppRailTile
+		bind:group={currentTile}
+		name="Inventory"
+		value={3}
+		title="Inventory"
+		on:click={() => currentTile + 1}
+	>
+		<svelte:fragment slot="lead">
+			<div class="flex items-center justify-center">
 				<Box />
 			</div>
-        </svelte:fragment>
+		</svelte:fragment>
 		<span>Inventory</span>
 	</AppRailTile>
 	<AppRailTile
 		bind:group={currentTile}
 		name="Customers"
-		value={3}
+		value={4}
 		title="Customers"
-		on:click={handleTileClick}
+		on:click={() => currentTile + 1}
 	>
 		<svelte:fragment slot="lead">
-            <div class="flex items-center justify-center">
+			<div class="flex items-center justify-center">
 				<People />
 			</div>
-        </svelte:fragment>
+		</svelte:fragment>
 		<span>Customers</span>
 	</AppRailTile>
 	<AppRailTile
 		bind:group={currentTile}
 		name="Reports"
-		value={4}
+		value={5}
 		title="Reports"
-		on:click={handleTileClick}
+		on:click={() => currentTile + 1}
 	>
 		<svelte:fragment slot="lead">
-            <div class="flex items-center justify-center">
+			<div class="flex items-center justify-center">
 				<FileBarGraph />
 			</div>
-        </svelte:fragment>
+		</svelte:fragment>
 		<span>Reports</span>
 	</AppRailTile>
 </AppRail>
