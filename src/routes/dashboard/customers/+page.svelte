@@ -2,13 +2,17 @@
 	import {
 		Autocomplete,
 		Drawer,
+		focusTrap,
 		getDrawerStore,
+		getToastStore,
 		Table,
-		tableMapperValues
+		tableMapperValues,
 	} from '@skeletonlabs/skeleton';
-	import type { AutocompleteOption, DrawerSettings, TableSource } from '@skeletonlabs/skeleton';
+	import type { AutocompleteOption, DrawerSettings, TableSource, ToastSettings } from '@skeletonlabs/skeleton';
 
-	let lastName, firstName, email, phone, company: string;
+	let lastName: string, firstName: string, email: string, phone: string;
+	let company: string = '';
+	let isFocused: boolean = true;
 
 	const sourceData = [
 		{
@@ -66,8 +70,6 @@
 	const drawerStore = getDrawerStore();
 	drawerStore.close();
 
-	let companyInput = '';
-
 	const companyOptions: AutocompleteOption<string>[] = [
 		{ label: 'Rage Avenue Co.', value: 'Rage Avenue Co.', keywords: 'printing, tshirt, tarpaulin' },
 		{ label: 'ABC', value: 'ABC', keywords: 'sample' },
@@ -83,7 +85,13 @@
 	];
 
 	function onCompanySelection(event: CustomEvent<AutocompleteOption<string>>): void {
-		companyInput = event.detail.label;
+		company = event.detail.label;
+	}
+
+	const toastStore = getToastStore();
+	const toastSettings: ToastSettings = {
+		message: '',
+		timeout: 5000
 	}
 </script>
 
@@ -103,26 +111,49 @@
 		method="POST"
 		autocomplete="off"
 		class="p-6"
-		on:submit={(e) => {
-			e.preventDefault();
+		use:focusTrap={isFocused}
+		on:submit|preventDefault={async () => {
+			try {
+				let response = await fetch('/api/admin/customer/insert', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						lastName: lastName,
+						firstName: firstName,
+						email: email,
+						phone: phone,
+						company: company
+					})
+				});
+
+				let result = await response.json();
+
+				toastSettings.message = result.message;
+				toastStore.trigger(toastSettings);
+				drawerStore.close();
+			} catch (error) {
+				console.error(error);
+			}
 		}}
 	>
 		<h2 class="h4">Create Customers</h2>
 		<label class="label mt-4">
 			<span>Last Name</span>
-			<input class="input" type="text" placeholder="Dela Cruz" name="lastName" />
+			<input class="input" type="text" placeholder="Dela Cruz" name="lastName" bind:value={lastName} />
 		</label>
 		<label class="label mt-4">
 			<span>First Name</span>
-			<input class="input" type="text" placeholder="Juan" name="firstName" />
+			<input class="input" type="text" placeholder="Juan" name="firstName" bind:value={firstName} />
 		</label>
 		<label class="label mt-4">
 			<span>Email</span>
-			<input class="input" type="email" placeholder="juandelacruz@sample.com" name="email" />
+			<input class="input" type="email" placeholder="juandelacruz@sample.com" name="email" bind:value={email} />
 		</label>
 		<label class="label mt-4">
 			<span>Phone</span>
-			<input class="input" type="text" placeholder="+639171234567" name="phone" />
+			<input class="input" type="text" placeholder="+639171234567" name="phone" bind:value={phone} />
 		</label>
 		<label class="label mt-4">
 			<span>Company</span>
@@ -131,14 +162,14 @@
 				type="text"
 				placeholder="Rage Avenue Co."
 				name="company"
-				bind:value={companyInput}
+				bind:value={company}
 			/>
 		</label>
 		{#key company}
-			{#if companyInput.length > 0 && companyOptions.length > 0}
+			{#if company.length > 0 && companyOptions.length > 0}
 				<div class="card w-full max-w-sm max-h-48 p-4 my-4 overflow-y-auto" tabindex="-1">
 					<Autocomplete
-						bind:input={companyInput}
+						bind:input={company}
 						options={companyOptions}
 						on:selection={onCompanySelection}
 					/>

@@ -8,6 +8,7 @@
 		initializeStores,
 		getDrawerStore,
 		LightSwitch,
+		Toast,
 		popup
 	} from '@skeletonlabs/skeleton';
 	import type { DrawerSettings, PopupSettings } from '@skeletonlabs/skeleton';
@@ -106,5 +107,6 @@
 	<!-- Page Route Content -->
 	<div class="px-6 py-4">
 		<slot />
+		<Toast />
 	</div>
 </AppShell>
