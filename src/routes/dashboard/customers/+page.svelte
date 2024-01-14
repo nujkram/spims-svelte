@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import {
 		Autocomplete,
 		Drawer,
@@ -6,55 +7,55 @@
 		getDrawerStore,
 		getToastStore,
 		Table,
-		tableMapperValues,
+		tableMapperValues
 	} from '@skeletonlabs/skeleton';
-	import type { AutocompleteOption, DrawerSettings, TableSource, ToastSettings } from '@skeletonlabs/skeleton';
+	import type {
+		AutocompleteOption,
+		DrawerSettings,
+		TableSource,
+		ToastSettings
+	} from '@skeletonlabs/skeleton';
 
 	let lastName: string, firstName: string, email: string, phone: string;
 	let company: string = '';
 	let isFocused: boolean = true;
 
-	const sourceData = [
-		{
-			position: 1,
-			name: 'John Doe',
-			company: 'Rage Avenue Co.',
-			email: 'johndoe@gmail.com',
-			phone: '+639171234567'
-		},
-		{
-			position: 2,
-			name: 'Jane Doe',
-			company: 'Rage Avenue Co.',
-			email: 'janedoe@gmail.com',
-			phone: '+639171234568'
-		},
-		{
-			position: 3,
-			name: 'John Smith',
-			company: 'Rage Avenue Co.',
-			email: 'johnsmith@gmail.com',
-			phone: '+639171234569'
-		},
-		{
-			position: 4,
-			name: 'Jane Smith',
-			company: 'Rage Avenue Co.',
-			email: 'janesmith@gmail.com',
-			phone: '+639171234560'
-		}
-	];
-
-	const tableSample: TableSource = {
+	let sourceData: any = [];
+	let companyOptions;
+	let customerTable: TableSource = {
 		// A list of heading labels.
 		head: ['Name', 'Company', 'Email', 'Phone'],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['name', 'company', 'email', 'phone']),
-		// Optional: The data returned when interactive is enabled and a row is clicked.
-		meta: tableMapperValues(sourceData, ['position', 'name', 'company', 'email', 'phone']),
-		// Optional: A list of footer labels.
-		foot: ['Total', '', '<code class="code">4</code>']
+		body: tableMapperValues(sourceData, ['fullName', 'company', 'email', 'phone'])
 	};
+
+	async function loadData() {
+		try {
+			let response = await fetch('/api/admin/customer', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			let result = await response.json();
+			sourceData = result.response;
+			customerTable.body = tableMapperValues(sourceData, ['fullName', 'company', 'email', 'phone']);
+			customerTable.meta = tableMapperValues(sourceData, ['fullName', 'company', 'email', 'phone']);
+			customerTable.foot = ['Total', '', `<code class="code">${sourceData.length}</code>`];
+			const uniqueCompanies = new Set(sourceData.map(item => item.company));
+
+			companyOptions = [...uniqueCompanies].map(company => {
+			return {
+				label: company,
+				value: company,
+				keywords: company
+			}
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
 	const drawerSettings: DrawerSettings = {
 		id: 'createCustomer',
@@ -70,20 +71,6 @@
 	const drawerStore = getDrawerStore();
 	drawerStore.close();
 
-	const companyOptions: AutocompleteOption<string>[] = [
-		{ label: 'Rage Avenue Co.', value: 'Rage Avenue Co.', keywords: 'printing, tshirt, tarpaulin' },
-		{ label: 'ABC', value: 'ABC', keywords: 'sample' },
-		{ label: 'XYZ', value: 'XZY', keywords: 'sample' },
-		{
-			label: 'Neapolitan',
-			value: 'neapolitan',
-			keywords: 'mix, strawberry, chocolate, vanilla',
-			meta: { healthy: false }
-		},
-		{ label: 'Pineapple', value: 'pineapple', keywords: 'fruit', meta: { healthy: true } },
-		{ label: 'Peach', value: 'peach', keywords: 'fruit', meta: { healthy: true } }
-	];
-
 	function onCompanySelection(event: CustomEvent<AutocompleteOption<string>>): void {
 		company = event.detail.label;
 	}
@@ -92,7 +79,11 @@
 	const toastSettings: ToastSettings = {
 		message: '',
 		timeout: 5000
-	}
+	};
+
+	onMount(async () => {
+		await loadData();
+	});
 </script>
 
 <div class="card mb-4">
@@ -105,7 +96,9 @@
 		>
 	</section>
 </div>
-<Table source={tableSample} />
+{#key sourceData}
+	<Table source={customerTable} />
+{/key}
 <Drawer>
 	<form
 		method="POST"
@@ -132,6 +125,7 @@
 
 				toastSettings.message = result.message;
 				toastStore.trigger(toastSettings);
+				loadData();
 				drawerStore.close();
 			} catch (error) {
 				console.error(error);
@@ -141,7 +135,13 @@
 		<h2 class="h4">Create Customers</h2>
 		<label class="label mt-4">
 			<span>Last Name</span>
-			<input class="input" type="text" placeholder="Dela Cruz" name="lastName" bind:value={lastName} />
+			<input
+				class="input"
+				type="text"
+				placeholder="Dela Cruz"
+				name="lastName"
+				bind:value={lastName}
+			/>
 		</label>
 		<label class="label mt-4">
 			<span>First Name</span>
@@ -149,11 +149,23 @@
 		</label>
 		<label class="label mt-4">
 			<span>Email</span>
-			<input class="input" type="email" placeholder="juandelacruz@sample.com" name="email" bind:value={email} />
+			<input
+				class="input"
+				type="email"
+				placeholder="juandelacruz@sample.com"
+				name="email"
+				bind:value={email}
+			/>
 		</label>
 		<label class="label mt-4">
 			<span>Phone</span>
-			<input class="input" type="text" placeholder="+639171234567" name="phone" bind:value={phone} />
+			<input
+				class="input"
+				type="text"
+				placeholder="+639171234567"
+				name="phone"
+				bind:value={phone}
+			/>
 		</label>
 		<label class="label mt-4">
 			<span>Company</span>
