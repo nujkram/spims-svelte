@@ -24,17 +24,21 @@
 	let isFocused: boolean = true;
 
 	let sourceData: any = [];
-	let companyOptions: any;
 	let table: TableSource = {
 		// A list of heading labels.
-		head: ['Name', 'Addess', 'Company', 'Email', 'Phone'],
+		head: ['Name', 'Username', 'Email', 'Phone'],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['fullName', 'address', 'company', 'email', 'phone'])
+		body: tableMapperValues(sourceData, [
+			'fullName',
+			'username',
+			'email',
+			'profile.phone'
+		])
 	};
 
 	async function loadData() {
 		try {
-			let response = await fetch('/api/admin/customer', {
+			let response = await fetch('/api/admin/user', {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json'
@@ -45,15 +49,6 @@
 			sourceData = result.response;
 
 			updateTable(sourceData);
-			const uniqueCompanies = new Set(sourceData.map((item: any) => item.company));
-
-			companyOptions = [...uniqueCompanies].map((company) => {
-				return {
-					label: company,
-					value: company,
-					keywords: company
-				};
-			});
 		} catch (error) {
 			console.error(error);
 		}
@@ -73,11 +68,6 @@
 	const drawerStore = getDrawerStore();
 	drawerStore.close();
 
-	// autocomplete company selection event handler function to update company value on selection
-	function onCompanySelection(event: CustomEvent<AutocompleteOption<string>>): void {
-		company = event.detail.label;
-	}
-
 	const toastStore = getToastStore();
 	const toastSettings: ToastSettings = {
 		message: '',
@@ -89,7 +79,7 @@
 		if (keyword.length > 0) {
 			let filteredData = sourceData.filter((item: any) => {
 				return (
-					item.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.displayName.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.address.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.company.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.email.toLowerCase().includes(keyword.toLowerCase()) ||
@@ -105,21 +95,20 @@
 
 	const updateTable = (sourceData: any) => {
 		paginationSettings.size = sourceData.length;
+		
 		let paginatedData = sourceData.slice(
 			paginationSettings.page * paginationSettings.limit,
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
 		table.body = tableMapperValues(paginatedData, [
 			'fullName',
-			'address',
-			'company',
+			'username',
 			'email',
 			'phone'
 		]);
 		table.meta = tableMapperValues(paginatedData, [
 			'fullName',
-			'address',
-			'company',
+			'username',
 			'email',
 			'phone'
 		]);
@@ -226,7 +215,13 @@
 		</label>
 		<label class="label mt-4">
 			<span>Address</span>
-			<input class="input" type="text" placeholder="Roxas City" name="address" bind:value={address} />
+			<input
+				class="input"
+				type="text"
+				placeholder="Roxas City"
+				name="address"
+				bind:value={address}
+			/>
 		</label>
 		<label class="label mt-4">
 			<span>Email</span>
@@ -258,17 +253,6 @@
 				bind:value={company}
 			/>
 		</label>
-		{#key company}
-			{#if company.length > 0 && companyOptions.length > 0}
-				<div class="card w-full max-w-sm max-h-48 p-4 my-4 overflow-y-auto" tabindex="-1">
-					<Autocomplete
-						bind:input={company}
-						options={companyOptions}
-						on:selection={onCompanySelection}
-					/>
-				</div>
-			{/if}
-		{/key}
 
 		<div class="flex gap-4 place-content-end w-full">
 			<button type="submit" class="btn variant-filled-success mt-4">Submit</button>
