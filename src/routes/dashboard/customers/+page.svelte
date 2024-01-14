@@ -18,7 +18,7 @@
 		ToastSettings
 	} from '@skeletonlabs/skeleton';
 
-	let lastName: string, firstName: string, email: string, phone: string;
+	let lastName: string, firstName: string, address: string, email: string, phone: string;
 	let company: string = '';
 	let keyword: string = '';
 	let isFocused: boolean = true;
@@ -27,9 +27,9 @@
 	let companyOptions: any;
 	let customerTable: TableSource = {
 		// A list of heading labels.
-		head: ['Name', 'Company', 'Email', 'Phone'],
+		head: ['Name', 'Addess', 'Company', 'Email', 'Phone'],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['fullName', 'company', 'email', 'phone'])
+		body: tableMapperValues(sourceData, ['fullName', 'address', 'company', 'email', 'phone'])
 	};
 
 	async function loadData() {
@@ -90,6 +90,7 @@
 			let filteredData = sourceData.filter((item: any) => {
 				return (
 					item.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.address.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.company.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.email.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.phone.toLowerCase().includes(keyword.toLowerCase())
@@ -110,12 +111,14 @@
 		);
 		customerTable.body = tableMapperValues(paginatedData, [
 			'fullName',
+			'address',
 			'company',
 			'email',
 			'phone'
 		]);
 		customerTable.meta = tableMapperValues(paginatedData, [
 			'fullName',
+			'address',
 			'company',
 			'email',
 			'phone'
@@ -188,6 +191,7 @@
 					body: JSON.stringify({
 						lastName: lastName,
 						firstName: firstName,
+						address: address,
 						email: email,
 						phone: phone,
 						company: company
@@ -219,6 +223,10 @@
 		<label class="label mt-4">
 			<span>First Name</span>
 			<input class="input" type="text" placeholder="Juan" name="firstName" bind:value={firstName} />
+		</label>
+		<label class="label mt-4">
+			<span>Address</span>
+			<input class="input" type="text" placeholder="Roxas City" name="address" bind:value={address} />
 		</label>
 		<label class="label mt-4">
 			<span>Email</span>
