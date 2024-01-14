@@ -6,22 +6,25 @@
 		focusTrap,
 		getDrawerStore,
 		getToastStore,
+		Paginator,
 		Table,
 		tableMapperValues
 	} from '@skeletonlabs/skeleton';
 	import type {
 		AutocompleteOption,
 		DrawerSettings,
+		PaginationSettings,
 		TableSource,
 		ToastSettings
 	} from '@skeletonlabs/skeleton';
 
 	let lastName: string, firstName: string, email: string, phone: string;
 	let company: string = '';
+	let keyword: string = '';
 	let isFocused: boolean = true;
 
 	let sourceData: any = [];
-	let companyOptions;
+	let companyOptions: any;
 	let customerTable: TableSource = {
 		// A list of heading labels.
 		head: ['Name', 'Company', 'Email', 'Phone'],
@@ -40,17 +43,16 @@
 
 			let result = await response.json();
 			sourceData = result.response;
-			customerTable.body = tableMapperValues(sourceData, ['fullName', 'company', 'email', 'phone']);
-			customerTable.meta = tableMapperValues(sourceData, ['fullName', 'company', 'email', 'phone']);
-			customerTable.foot = ['Total', '', `<code class="code">${sourceData.length}</code>`];
-			const uniqueCompanies = new Set(sourceData.map(item => item.company));
 
-			companyOptions = [...uniqueCompanies].map(company => {
-			return {
-				label: company,
-				value: company,
-				keywords: company
-			}
+			updateTable(sourceData);
+			const uniqueCompanies = new Set(sourceData.map((item: any) => item.company));
+
+			companyOptions = [...uniqueCompanies].map((company) => {
+				return {
+					label: company,
+					value: company,
+					keywords: company
+				};
 			});
 		} catch (error) {
 			console.error(error);
@@ -71,6 +73,7 @@
 	const drawerStore = getDrawerStore();
 	drawerStore.close();
 
+	// autocomplete company selection event handler function to update company value on selection
 	function onCompanySelection(event: CustomEvent<AutocompleteOption<string>>): void {
 		company = event.detail.label;
 	}
@@ -81,23 +84,93 @@
 		timeout: 5000
 	};
 
+	const filterTable = (keyword: string) => {
+		paginationSettings.page = 0;
+		if (keyword.length > 0) {
+			let filteredData = sourceData.filter((item: any) => {
+				return (
+					item.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.company.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.email.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.phone.toLowerCase().includes(keyword.toLowerCase())
+				);
+			});
+
+			updateTable(filteredData);
+		} else {
+			updateTable(sourceData);
+		}
+	};
+
+	const updateTable = (sourceData: any) => {
+		paginationSettings.size = sourceData.length;
+		let paginatedData = sourceData.slice(
+			paginationSettings.page * paginationSettings.limit,
+			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
+		);
+		customerTable.body = tableMapperValues(paginatedData, [
+			'fullName',
+			'company',
+			'email',
+			'phone'
+		]);
+		customerTable.meta = tableMapperValues(paginatedData, [
+			'fullName',
+			'company',
+			'email',
+			'phone'
+		]);
+		customerTable.foot = ['Total', '', '', `<code class="code">${sourceData.length}</code>`];
+	};
+
+	let paginationSettings = {
+		page: 0,
+		limit: 10,
+		size: sourceData.length,
+		amounts: [10, 20, 25, 30, 50, 100]
+	} satisfies PaginationSettings;
+
+	// pagination event handlers
+	function onPageChange(e: CustomEvent): void {
+		paginationSettings.page = e.detail;
+		updateTable(sourceData);
+	}
+
+	// pagination event handlers
+	function onAmountChange(e: CustomEvent): void {
+		paginationSettings.limit = e.detail;
+		updateTable(sourceData);
+	}
+
 	onMount(async () => {
 		await loadData();
 	});
+
+	$: filterTable(keyword);
 </script>
 
 <div class="card mb-4">
 	<header class="card-header">
 		<h1 class="h3">Customers</h1>
 	</header>
-	<section class="flex p-4 w-full">
+	<section class="flex p-4 w-full gap-4">
 		<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerSettings)}
 			>Add Customer</button
 		>
+		<input class="input ml-auto" type="text" placeholder="Search" bind:value={keyword} />
 	</section>
 </div>
+
 {#key sourceData}
 	<Table source={customerTable} />
+	<Paginator
+		class="mt-4"
+		bind:settings={paginationSettings}
+		on:page={onPageChange}
+		on:amount={onAmountChange}
+		showFirstLastButtons={false}
+		showPreviousNextButtons={true}
+	/>
 {/key}
 <Drawer>
 	<form
