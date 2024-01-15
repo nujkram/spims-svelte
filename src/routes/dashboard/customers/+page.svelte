@@ -18,7 +18,7 @@
 		ToastSettings
 	} from '@skeletonlabs/skeleton';
 
-	let lastName: string, firstName: string, address: string, email: string, phone: string;
+	let lastName: string, firstName: string, address: string, email: string, phone: string, tin: string;
 	let company: string = '';
 	let keyword: string = '';
 	let isFocused: boolean = true;
@@ -194,6 +194,7 @@
 						address: address,
 						email: email,
 						phone: phone,
+						tin: tin,
 						company: company
 					})
 				});
@@ -265,6 +266,17 @@
 				placeholder="+639171234567"
 				name="phone"
 				bind:value={phone}
+				required
+			/>
+		</label>
+		<label class="label mt-4">
+			<span>TIN</span>
+			<input
+				class="input"
+				type="text"
+				placeholder="000-123-456-001"
+				name="tin"
+				bind:value={tin}
 				required
 			/>
 		</label>

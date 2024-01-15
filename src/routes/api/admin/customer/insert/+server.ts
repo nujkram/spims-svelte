@@ -11,6 +11,7 @@ export async function POST({ request, locals }: unknown) {
     data.fullName = `${data.firstName} ${data.lastName}`;
     data.createdAt = new Date();
     data.createdBy = locals.user._id;
+    data.updatedBy = locals.user._id;
 
     const response = await Customer.insertOne(data);
     if (response) {

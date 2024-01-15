@@ -34,6 +34,8 @@ export async function POST({ request, locals }: any) {
 		isActive: true,
 		isFake: false,
 		role: data.role,
+		createdBy: locals.user._id,
+		updatedBy: locals.user._id
 	}
 	
 	const response = await User.insertOne(user);
