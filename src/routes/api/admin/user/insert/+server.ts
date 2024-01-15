@@ -43,6 +43,7 @@ export async function POST({ request, locals }: any) {
 		return new Response(
 			JSON.stringify({
 				status: 'Success',
+				message: 'Data inserted successfully',
 				response
 			})
 		);
