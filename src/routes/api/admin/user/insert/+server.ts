@@ -6,10 +6,6 @@ export async function POST({ request, locals }: any) {
 	const data = await request.json();
 	const db = await clientPromise();
 	const User = db.collection('users');
-    data.
-	const profile = {
-		
-	}
 
 	const user = {
 		_id: id(),
@@ -29,10 +25,10 @@ export async function POST({ request, locals }: any) {
 				verified: true
 			}
 		],
-		fullName = `${data.firstName} ${data.lastName}`,
+		fullName: `${data.firstName} ${data.lastName}`,
         firstName: data.firstName,
-		middleName: data.middleName,
 		lastName: data.lastName,
+		username: data.username,
 		phone: data.phone,
 		email: data.email,
 		isActive: true,
