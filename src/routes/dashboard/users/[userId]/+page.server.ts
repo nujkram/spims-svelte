@@ -29,6 +29,6 @@ export async function load({params}) {
     ];
     
     const [user] = await Users.aggregate(pipeline).toArray();
-    console.log(user);
+
     return {user};
 }

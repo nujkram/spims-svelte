@@ -91,7 +91,7 @@
 			'phone'
 		]);
 		table.meta = tableMapperValues(paginatedData, ['_id', 'role', 'username', 'email', 'phone']);
-		table.foot = ['Total', '', '', `<code class="code">${sourceData.length}</code>`];
+		table.foot = ['Total', '', '', '', `<code class="code">${sourceData.length}</code>`];
 	};
 
 	let paginationSettings = {
@@ -119,7 +119,6 @@
 
 	// table row select handler
 	function tableSelectHandler(e: CustomEvent): void {
-		console.log(e.detail[0]);
 		goto(`/dashboard/users/${e.detail[0]}`);
 	}
 
