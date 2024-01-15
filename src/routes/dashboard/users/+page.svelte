@@ -1,37 +1,32 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Create from '$lib/components/forms/user/Create.svelte';
 	import {
-		Autocomplete,
 		Drawer,
-		focusTrap,
 		getDrawerStore,
-		getToastStore,
 		Paginator,
 		Table,
 		tableMapperValues
 	} from '@skeletonlabs/skeleton';
 	import type {
-		AutocompleteOption,
 		DrawerSettings,
 		PaginationSettings,
 		TableSource,
-		ToastSettings
 	} from '@skeletonlabs/skeleton';
-	import Create from '$lib/components/forms/customer/Create.svelte';
+	import { goto } from '$app/navigation';
 
 	let keyword: string = '';
-
 	let sourceData: any = [];
 	let table: TableSource = {
 		// A list of heading labels.
-		head: ['Name', 'Addess', 'Company', 'Email', 'Phone'],
+		head: ['Name', 'Role', 'Username', 'Email', 'Phone'],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['fullName', 'address', 'company', 'email', 'phone'])
+		body: tableMapperValues(sourceData, ['fullName', 'role', 'username', 'email', 'profile.phone'])
 	};
 
 	async function loadData() {
 		try {
-			let response = await fetch('/api/admin/customer', {
+			let response = await fetch('/api/admin/user', {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json'
@@ -47,8 +42,9 @@
 		}
 	}
 
+	// drawer settings
 	const drawerCreate: DrawerSettings = {
-		id: 'createCustomer',
+		id: 'createUser',
 		// Provide your property overrides:
 		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
 		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
@@ -66,7 +62,7 @@
 		if (keyword.length > 0) {
 			let filteredData = sourceData.filter((item: any) => {
 				return (
-					item.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.displayName.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.address.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.company.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.email.toLowerCase().includes(keyword.toLowerCase()) ||
@@ -82,24 +78,19 @@
 
 	const updateTable = (sourceData: any) => {
 		paginationSettings.size = sourceData.length;
+
 		let paginatedData = sourceData.slice(
 			paginationSettings.page * paginationSettings.limit,
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
 		table.body = tableMapperValues(paginatedData, [
 			'fullName',
-			'address',
-			'company',
+			'role',
+			'username',
 			'email',
 			'phone'
 		]);
-		table.meta = tableMapperValues(paginatedData, [
-			'fullName',
-			'address',
-			'company',
-			'email',
-			'phone'
-		]);
+		table.meta = tableMapperValues(paginatedData, ['_id', 'role', 'username', 'email', 'phone']);
 		table.foot = ['Total', '', '', '', `<code class="code">${sourceData.length}</code>`];
 	};
 
@@ -126,23 +117,28 @@
 		await loadData();
 	});
 
+	// table row select handler
+	function tableSelectHandler(e: CustomEvent): void {
+		goto(`/dashboard/users/${e.detail[0]}`);
+	}
+
 	$: filterTable(keyword);
 </script>
 
 <div class="card mb-4">
 	<header class="card-header">
-		<h1 class="h3">Customers</h1>
+		<h1 class="h3">Users</h1>
 	</header>
 	<section class="flex p-4 w-full gap-4">
 		<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
-			>Add Customer</button
+			>Add User</button
 		>
 		<input class="input ml-auto" type="text" placeholder="Search" bind:value={keyword} />
 	</section>
 </div>
 
 {#key sourceData}
-	<Table source={table} />
+	<Table source={table} interactive={true} on:selected={tableSelectHandler} />
 	<Paginator
 		class="mt-4"
 		bind:settings={paginationSettings}
@@ -153,7 +149,7 @@
 	/>
 {/key}
 <Drawer>
-	{#if $drawerStore.id === 'createCustomer'}
-		<Create {drawerStore} {loadData} {sourceData} />
+	{#if $drawerStore.id === 'createUser'}
+		<Create {drawerStore} {loadData} />
 	{/if}
 </Drawer>

@@ -47,16 +47,13 @@
 				value.data.user = {
 					_id: data.user._id,
 					profile: {
-						email: data.user.profile.email,
-						firstName: data.user.profile.firstName,
-						lastName: data.user.profile.lastName,
-						phone: data.user.profile.phone,
-						photo: data.user.profile.photo,
-						country: data.user.profile.country,
-						province: data.user.profile.province,
-						displayName: data.user.profile.displayName
+						email: data.user.email,
+						firstName: data.user.firstName,
+						lastName: data.user.lastName,
+						phone: data.user.phone,
+						fullName: data.user.fullName
 					},
-					email: data.user.profile.email
+					email: data.user.email
 				};
 			});
 			drawerStore.close();

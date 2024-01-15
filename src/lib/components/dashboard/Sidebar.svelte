@@ -11,7 +11,8 @@
 		2: '/dashboard/purchase',
 		3: '/dashboard/inventory',
 		4: '/dashboard/customers',
-		5: '/dashboard/reports'
+		5: '/dashboard/users',
+		6: '/dashboard/reports'
 	};
 
 	const handleTileClick = (i: number) => {
@@ -94,8 +95,22 @@
 	</AppRailTile>
 	<AppRailTile
 		bind:group={currentTile}
-		name="Reports"
+		name="Users"
 		value={5}
+		title="Users"
+		on:click={() => currentTile + 1}
+	>
+		<svelte:fragment slot="lead">
+			<div class="flex items-center justify-center">
+				<People />
+			</div>
+		</svelte:fragment>
+		<span>Users</span>
+	</AppRailTile>
+	<AppRailTile
+		bind:group={currentTile}
+		name="Reports"
+		value={6}
 		title="Reports"
 		on:click={() => currentTile + 1}
 	>
