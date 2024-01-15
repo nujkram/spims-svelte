@@ -205,6 +205,9 @@
 				loadData();
 				drawerStore.close();
 			} catch (error) {
+				toastSettings.message = error.message;
+				toastSettings.background = 'variant-filled-error';
+				toastStore.trigger(toastSettings);
 				console.error(error);
 			}
 		}}
@@ -218,15 +221,30 @@
 				placeholder="Dela Cruz"
 				name="lastName"
 				bind:value={lastName}
+				required
 			/>
 		</label>
 		<label class="label mt-4">
 			<span>First Name</span>
-			<input class="input" type="text" placeholder="Juan" name="firstName" bind:value={firstName} />
+			<input
+				class="input"
+				type="text"
+				placeholder="Juan"
+				name="firstName"
+				bind:value={firstName}
+				required
+			/>
 		</label>
 		<label class="label mt-4">
 			<span>Address</span>
-			<input class="input" type="text" placeholder="Roxas City" name="address" bind:value={address} />
+			<input
+				class="input"
+				type="text"
+				placeholder="Roxas City"
+				name="address"
+				bind:value={address}
+				required
+			/>
 		</label>
 		<label class="label mt-4">
 			<span>Email</span>
@@ -236,6 +254,7 @@
 				placeholder="juandelacruz@sample.com"
 				name="email"
 				bind:value={email}
+				required
 			/>
 		</label>
 		<label class="label mt-4">
@@ -246,6 +265,7 @@
 				placeholder="+639171234567"
 				name="phone"
 				bind:value={phone}
+				required
 			/>
 		</label>
 		<label class="label mt-4">
@@ -256,6 +276,7 @@
 				placeholder="Rage Avenue Co."
 				name="company"
 				bind:value={company}
+				required
 			/>
 		</label>
 		{#key company}
