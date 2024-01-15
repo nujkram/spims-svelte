@@ -41,11 +41,12 @@
 				let result = await response.json();
 
 				toastSettings.message = result.message;
+				toastSettings.background = 'bg-green-500';
 				toastStore.trigger(toastSettings);
 				goto('/dashboard/users');
 			} catch (error) {
 				toastSettings.message = error.message;
-				toastSettings.background = 'variant-filled-error';
+				toastSettings.background = 'bg-red-500';
 				toastStore.trigger(toastSettings);
 				console.error(error);
 			}

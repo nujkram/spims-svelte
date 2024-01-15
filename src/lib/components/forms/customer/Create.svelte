@@ -1,19 +1,11 @@
 <script lang="ts">
 	import {
 		Autocomplete,
-		Drawer,
 		focusTrap,
-		getDrawerStore,
 		getToastStore,
-		Paginator,
-		Table,
-		tableMapperValues
 	} from '@skeletonlabs/skeleton';
 	import type {
 		AutocompleteOption,
-		DrawerSettings,
-		PaginationSettings,
-		TableSource,
 		ToastSettings
 	} from '@skeletonlabs/skeleton';
 
@@ -84,7 +76,7 @@
 			drawerStore.close();
 		} catch (error) {
 			toastSettings.message = error.message;
-			toastSettings.background = 'variant-filled-error';
+			toastSettings.background = 'bg-red-500';
 			toastStore.trigger(toastSettings);
 			console.error(error);
 		}
