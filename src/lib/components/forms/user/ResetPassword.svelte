@@ -24,8 +24,8 @@
 	on:submit|preventDefault={async () => {
 		try {
 			if (password != confirmPassword) {
-				toastSettings.message = 'Password and Confirm Password does not match';
-				toastSettings.background = 'variant-filled-error';
+				toastSettings.message = 'Password and confirm password does not match';
+				toastSettings.background = 'bg-red-500';
 				toastStore.trigger(toastSettings);
 				return;
 			}
@@ -44,11 +44,12 @@
 			let result = await response.json();
 
 			toastSettings.message = result.message;
+			toastSettings.background = 'bg-green-500';
 			toastStore.trigger(toastSettings);
 			drawerStore.close();
 		} catch (error) {
 			toastSettings.message = error.message;
-			toastSettings.background = 'variant-filled-error';
+			toastSettings.background = 'bg-red-500';
 			toastStore.trigger(toastSettings);
 			console.error(error);
 		}

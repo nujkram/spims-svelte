@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import {
 		Drawer,
 		getDrawerStore,
@@ -12,22 +13,21 @@
 		PaginationSettings,
 		TableSource,
 	} from '@skeletonlabs/skeleton';
-	import Create from '$lib/components/forms/customer/Create.svelte';
-	import { goto } from '$app/navigation';
+	import Create from '$lib/components/forms/product/Create.svelte';
 
 	let keyword: string = '';
 
 	let sourceData: any = [];
 	let table: TableSource = {
 		// A list of heading labels.
-		head: ['Name', 'Addess', 'Company', 'Email', 'Phone'],
+		head: ['Name', 'Category', 'Price', 'Status'],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['fullName', 'address', 'company', 'email', 'phone'])
+		body: tableMapperValues(sourceData, ['name', 'category', 'price', 'status'])
 	};
 
 	async function loadData() {
 		try {
-			let response = await fetch('/api/admin/customer', {
+			let response = await fetch('/api/admin/product', {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json'
@@ -44,7 +44,7 @@
 	}
 
 	const drawerCreate: DrawerSettings = {
-		id: 'createCustomer',
+		id: 'createProduct',
 		// Provide your property overrides:
 		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
 		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
@@ -62,11 +62,10 @@
 		if (keyword.length > 0) {
 			let filteredData = sourceData.filter((item: any) => {
 				return (
-					item.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
-					item.address.toLowerCase().includes(keyword.toLowerCase()) ||
-					item.company.toLowerCase().includes(keyword.toLowerCase()) ||
-					item.email.toLowerCase().includes(keyword.toLowerCase()) ||
-					item.phone.toLowerCase().includes(keyword.toLowerCase())
+					item.name.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.category.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.price.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.status.toLowerCase().includes(keyword.toLowerCase())
 				);
 			});
 
@@ -83,20 +82,18 @@
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
 		table.body = tableMapperValues(paginatedData, [
-			'fullName',
-			'address',
-			'company',
-			'email',
-			'phone'
+			'name',
+			'category',
+			'price',
+			'status',
 		]);
 		table.meta = tableMapperValues(paginatedData, [
 			'_id',
-			'address',
-			'company',
-			'email',
-			'phone'
+			'category',
+			'price',
+			'status',
 		]);
-		table.foot = ['Total', '', '', '', `<code class="code">${sourceData.length}</code>`];
+		table.foot = ['Total', '', '', `<code class="code">${sourceData.length}</code>`];
 	};
 
 	let paginationSettings = {
@@ -124,7 +121,7 @@
 
 	// table row select handler
 	function tableSelectHandler(e: CustomEvent): void {
-		goto(`/dashboard/customers/${e.detail[0]}`);
+		goto(`/dashboard/products/${e.detail[0]}`);
 	}
 
 	$: filterTable(keyword);
@@ -132,11 +129,11 @@
 
 <div class="card mb-4">
 	<header class="card-header">
-		<h1 class="h3">Customers</h1>
+		<h1 class="h3">Products</h1>
 	</header>
 	<section class="flex p-4 w-full gap-4">
 		<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
-			>Add Customer</button
+			>Add Product</button
 		>
 		<input class="input ml-auto" type="text" placeholder="Search" bind:value={keyword} />
 	</section>
@@ -154,7 +151,7 @@
 	/>
 {/key}
 <Drawer>
-	{#if $drawerStore.id === 'createCustomer'}
+	{#if $drawerStore.id === 'createProduct'}
 		<Create {drawerStore} {loadData} {sourceData} />
 	{/if}
 </Drawer>

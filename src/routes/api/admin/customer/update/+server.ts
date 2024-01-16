@@ -4,27 +4,32 @@ import clientPromise from '$lib/server/mongo';
 export async function POST({ request, locals }: any) {
 	const data = await request.json();
 	const db = await clientPromise();
-	const User = db.collection('users');
-	
+	const Customer = db.collection('customers');
+
     for (const key in data) {
         if(key === '_id') continue;
         if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
+        if(key === 'email') data[key] = data[key].toLowerCase();
     }
 
-    const userUpdate = {
+    const customerUpdate = {
         $set: {
             updatedAt: new Date(),
             fullName: `${data.firstName} ${data.lastName}`,
             firstName: data.firstName,
             lastName: data.lastName,
+            address: data.address,
             phone: data.phone,
+            email: data.email,
+            tin: data.tin,
+            company: data.company,
             isActive: true,
-            role: data.role,
             updatedBy: locals.user._id
         }
     }
 
-    const response = await User.updateOne({ _id: data._id }, userUpdate);
+    console.log(data._id);
+    const response = await Customer.updateOne({ _id: data._id }, customerUpdate);
 
 	if (response) {
 		return new Response(

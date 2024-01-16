@@ -21,6 +21,12 @@
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 	initializeStores();
 
+	$: {
+		if (!$page.data.user) {
+			goto('/');
+		}
+	}
+
 	const popupClick: PopupSettings = {
 		event: 'click',
 		target: 'popupClick',

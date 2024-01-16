@@ -1,35 +1,25 @@
 <script lang="ts">
-	import {
-		Autocomplete,
-		focusTrap,
-		getToastStore,
-	} from '@skeletonlabs/skeleton';
-	import type {
-		AutocompleteOption,
-		ToastSettings
-	} from '@skeletonlabs/skeleton';
+	import { Autocomplete, focusTrap, getToastStore } from '@skeletonlabs/skeleton';
+	import type { AutocompleteOption, ToastSettings } from '@skeletonlabs/skeleton';
+	import { goto } from '$app/navigation';
 
-	export let loadData: () => void;
 	export let drawerStore = () => {};
-	export let sourceData: any;
-
-	let lastName: string,
-		firstName: string,
-		address: string,
-		email: string,
-		phone: string,
-		tin: string;
+	export let moduleName: string;
+	export let customer: any;
+	export let id: string;
+	export let customers: [];
 	let isFocused: boolean = true;
-	let company: string = '';
+	let company: string = customer?.company;
 	let companyOptions: any;
 
+	// toast settings
 	const toastStore = getToastStore();
 	const toastSettings: ToastSettings = {
 		message: '',
 		timeout: 5000
 	};
 
-	const uniqueCompanies = new Set(sourceData.map((item: any) => item.company));
+	const uniqueCompanies = new Set(customers.map((item: any) => item.company));
 
 	companyOptions = [...uniqueCompanies].map((company) => {
 		return {
@@ -52,18 +42,19 @@
 	use:focusTrap={isFocused}
 	on:submit|preventDefault={async () => {
 		try {
-			let response = await fetch('/api/admin/customer/insert', {
+			let response = await fetch('/api/admin/customer/update', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					lastName: lastName,
-					firstName: firstName,
-					address: address,
-					email: email,
-					phone: phone,
-					tin: tin,
+                    _id: id,
+					lastName: customer?.lastName,
+					firstName: customer?.firstName,
+					address: customer?.address,
+					email: customer?.email,
+					phone: customer?.phone,
+					tin: customer?.tin,
 					company: company
 				})
 			});
@@ -72,8 +63,7 @@
 
 			toastSettings.message = result.message;
 			toastStore.trigger(toastSettings);
-			loadData();
-			drawerStore.close();
+			goto(`/dashboard/${moduleName}`);
 		} catch (error) {
 			toastSettings.message = error.message;
 			toastSettings.background = 'bg-red-500';
@@ -90,7 +80,7 @@
 			type="text"
 			placeholder="Dela Cruz"
 			name="lastName"
-			bind:value={lastName}
+			bind:value={customer.lastName}
 			required
 		/>
 	</label>
@@ -101,7 +91,7 @@
 			type="text"
 			placeholder="Juan"
 			name="firstName"
-			bind:value={firstName}
+			bind:value={customer.firstName}
 			required
 		/>
 	</label>
@@ -112,7 +102,7 @@
 			type="text"
 			placeholder="Roxas City"
 			name="address"
-			bind:value={address}
+			bind:value={customer.address}
 			required
 		/>
 	</label>
@@ -123,7 +113,7 @@
 			type="email"
 			placeholder="juandelacruz@sample.com"
 			name="email"
-			bind:value={email}
+			bind:value={customer.email}
 			required
 		/>
 	</label>
@@ -134,7 +124,7 @@
 			type="text"
 			placeholder="+639171234567"
 			name="phone"
-			bind:value={phone}
+			bind:value={customer.phone}
 			required
 		/>
 	</label>
@@ -145,7 +135,7 @@
 			type="text"
 			placeholder="000-123-456-001"
 			name="tin"
-			bind:value={tin}
+			bind:value={customer.tin}
 			required
 		/>
 	</label>

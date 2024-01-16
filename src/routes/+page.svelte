@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
-	import type { DrawerSettings } from '@skeletonlabs/skeleton';
+	import { Drawer, getDrawerStore, getToastStore } from '@skeletonlabs/skeleton';
+	import type { DrawerSettings, ToastSettings } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { SHA256 } from 'crypto-js';
@@ -42,6 +42,10 @@
 		if (data.error) {
 			error = data.errorMessage || 'An error occured';
 			loggingIn = false;
+
+			toastSettings.message = 'Invalid username or password';
+			toastSettings.background = 'bg-red-500';
+			toastStore.trigger(toastSettings);
 		} else {
 			page.subscribe((value) => {
 				value.data.user = {
@@ -56,12 +60,18 @@
 					email: data.user.email
 				};
 			});
+
+			toastSettings.message = `Welcome back ${data.user.firstName}!`;
+			toastSettings.background = 'bg-green-500';
+			toastStore.trigger(toastSettings);
+
 			drawerStore.close();
 			goto('/dashboard');
 		}
 	};
 
-	const drawerSettings: DrawerSettings = {
+	// drawer settings
+	const drawerLogin: DrawerSettings = {
 		id: 'login',
 		// Provide your property overrides:
 		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
@@ -74,6 +84,13 @@
 
 	const drawerStore = getDrawerStore();
 	drawerStore.close();
+
+	// toats settings
+	const toastStore = getToastStore();
+	const toastSettings: ToastSettings = {
+		message: '',
+		timeout: 5000
+	};
 </script>
 
 <div class="container h-full mx-auto flex justify-center items-center lg:pr-64  pr-0">
@@ -136,7 +153,7 @@
 			<button
 				type="button"
 				class="btn variant-filled"
-				on:click={() => drawerStore.open(drawerSettings)}>Login</button
+				on:click={() => drawerStore.open(drawerLogin)}>Login</button
 			>
 		</div>
 	</div>

@@ -5,25 +5,23 @@ import clientPromise from '$lib/server/mongo';
 export async function POST({ request, locals }: unknown) {
     const data = await request.json();
     const db = await clientPromise();
-    const Customer = db.collection('customers');
+    const Product = db.collection('products');
 
     for (const key in data) {
         if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
-        if (key === 'email') data[key] = data[key].toLowerCase();
     }
 
     data._id = id();
-    data.fullName = `${data.firstName} ${data.lastName}`;
     data.createdAt = new Date();
     data.createdBy = locals.user._id;
     data.updatedBy = locals.user._id;
 
-    const response = await Customer.insertOne(data);
+    const response = await Product.insertOne(data);
     if (response) {
         return new Response(
             JSON.stringify({
                 success: true,
-                message: 'Customer added successfully',
+                message: 'Product added successfully',
                 data: response
             }),
             {
