@@ -1,23 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import {
-		Autocomplete,
 		Drawer,
-		focusTrap,
 		getDrawerStore,
-		getToastStore,
 		Paginator,
 		Table,
 		tableMapperValues
 	} from '@skeletonlabs/skeleton';
 	import type {
-		AutocompleteOption,
 		DrawerSettings,
 		PaginationSettings,
 		TableSource,
-		ToastSettings
 	} from '@skeletonlabs/skeleton';
 	import Create from '$lib/components/forms/customer/Create.svelte';
+	import { goto } from '$app/navigation';
 
 	let keyword: string = '';
 
@@ -94,7 +90,7 @@
 			'phone'
 		]);
 		table.meta = tableMapperValues(paginatedData, [
-			'fullName',
+			'_id',
 			'address',
 			'company',
 			'email',
@@ -126,6 +122,11 @@
 		await loadData();
 	});
 
+	// table row select handler
+	function tableSelectHandler(e: CustomEvent): void {
+		goto(`/dashboard/customers/${e.detail[0]}`);
+	}
+
 	$: filterTable(keyword);
 </script>
 
@@ -142,7 +143,7 @@
 </div>
 
 {#key sourceData}
-	<Table source={table} />
+	<Table source={table} interactive={true} on:selected={tableSelectHandler} />
 	<Paginator
 		class="mt-4"
 		bind:settings={paginationSettings}

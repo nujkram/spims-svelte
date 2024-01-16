@@ -7,6 +7,11 @@ export async function POST({ request, locals }: unknown) {
     const db = await clientPromise();
     const Customer = db.collection('customers');
 
+    for (const key in data) {
+        if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
+        if (key === 'email') data[key] = data[key].toLowerCase();
+    }
+
     data._id = id();
     data.fullName = `${data.firstName} ${data.lastName}`;
     data.createdAt = new Date();
