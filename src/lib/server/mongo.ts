@@ -33,7 +33,7 @@ async function connectToDatabase() {
 		? 'RageAvenueStaging'
 		: uri?.includes('Test')
 		? 'RageAvenueStagingTest'
-		: 'RageAvenueStaging';
+		: 'RageAvenue';
 
 	const db = await client.db(currentDb);
 	cachedDb = db;
