@@ -9,7 +9,7 @@
 		0: '/dashboard',
 		1: '/dashboard/orders',
 		2: '/dashboard/purchase',
-		3: '/dashboard/inventory',
+		3: '/dashboard/products',
 		4: '/dashboard/customers',
 		5: '/dashboard/users',
 		6: '/dashboard/reports'
@@ -67,9 +67,9 @@
 	</AppRailTile>
 	<AppRailTile
 		bind:group={currentTile}
-		name="Inventory"
+		name="Products"
 		value={3}
-		title="Inventory"
+		title="Products"
 		on:click={() => currentTile + 1}
 	>
 		<svelte:fragment slot="lead">
@@ -77,7 +77,7 @@
 				<Box />
 			</div>
 		</svelte:fragment>
-		<span>Inventory</span>
+		<span>Products</span>
 	</AppRailTile>
 	<AppRailTile
 		bind:group={currentTile}
