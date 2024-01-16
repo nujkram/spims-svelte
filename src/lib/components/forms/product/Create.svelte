@@ -46,10 +46,10 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					name: name,
-					price: price,
-					category: category,
-					status: status
+					name,
+					price,
+					status,
+					category
 				})
 			});
 

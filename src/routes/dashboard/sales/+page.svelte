@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import Create from '$lib/components/forms/user/Create.svelte';
 	import {
 		Drawer,
 		getDrawerStore,
@@ -8,25 +7,48 @@
 		Table,
 		tableMapperValues
 	} from '@skeletonlabs/skeleton';
-	import type {
-		DrawerSettings,
-		PaginationSettings,
-		TableSource,
-	} from '@skeletonlabs/skeleton';
+	import type { DrawerSettings, PaginationSettings, TableSource } from '@skeletonlabs/skeleton';
+	import Create from '$lib/components/forms/sales/Create.svelte';
 	import { goto } from '$app/navigation';
 
 	let keyword: string = '';
+
 	let sourceData: any = [];
+	let customerData: any = [];
+	let productData: any = [];
+	
 	let table: TableSource = {
 		// A list of heading labels.
-		head: ['Name', 'Role', 'Username', 'Email', 'Phone'],
+		head: [
+			'Customer',
+			'Addess',
+			'Description',
+			'OR No',
+			'Price',
+			'QTY',
+			'Amount',
+			'Downpayment',
+			'Balance',
+			'MOD'
+		],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['fullName', 'role', 'username', 'email', 'profile.phone'])
+		body: tableMapperValues(sourceData, [
+			'fullName',
+			'address',
+			'description',
+			'receipt',
+			'price',
+			'quantity',
+			'amount',
+			'downpayment',
+			'balance',
+			'paymentMethod'
+		])
 	};
 
 	async function loadData() {
 		try {
-			let response = await fetch('/api/admin/user', {
+			let response = await fetch('/api/admin/sales', {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json'
@@ -34,7 +56,9 @@
 			});
 
 			let result = await response.json();
-			sourceData = result.response;
+			sourceData = result.response.sales;
+			customerData = result.response.customers;
+			productData = result.response.products;
 
 			if(sourceData) updateTable(sourceData);
 		} catch (error) {
@@ -42,9 +66,8 @@
 		}
 	}
 
-	// drawer settings
 	const drawerCreate: DrawerSettings = {
-		id: 'createUser',
+		id: 'createSalesOrder',
 		// Provide your property overrides:
 		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
 		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
@@ -62,7 +85,7 @@
 		if (keyword.length > 0) {
 			let filteredData = sourceData.filter((item: any) => {
 				return (
-					item.displayName.toLowerCase().includes(keyword.toLowerCase()) ||
+					item.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.address.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.company.toLowerCase().includes(keyword.toLowerCase()) ||
 					item.email.toLowerCase().includes(keyword.toLowerCase()) ||
@@ -78,20 +101,35 @@
 
 	const updateTable = (sourceData: any) => {
 		paginationSettings.size = sourceData.length;
-
 		let paginatedData = sourceData.slice(
 			paginationSettings.page * paginationSettings.limit,
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
 		table.body = tableMapperValues(paginatedData, [
-			'fullName',
-			'role',
-			'username',
-			'email',
-			'phone'
+			'Customer',
+			'Addess',
+			'Description',
+			'OR No',
+			'Price',
+			'QTY',
+			'Amount',
+			'Downpayment',
+			'Balance',
+			'MOD'
 		]);
-		table.meta = tableMapperValues(paginatedData, ['_id', 'role', 'username', 'email', 'phone']);
-		table.foot = ['Total', '', '', '', `<code class="code">${sourceData.length}</code>`];
+		table.meta = tableMapperValues(paginatedData, [
+			'_id',
+			'address',
+			'description',
+			'receipt',
+			'price',
+			'quantity',
+			'amount',
+			'downpayment',
+			'balance',
+			'paymentMethod'
+		]);
+		table.foot = ['Total', '', '', '', '', '', '', '', '', `<code class="code">${sourceData.length}</code>`];
 	};
 
 	let paginationSettings = {
@@ -119,7 +157,7 @@
 
 	// table row select handler
 	function tableSelectHandler(e: CustomEvent): void {
-		goto(`/dashboard/users/${e.detail[0]}`);
+		goto(`/dashboard/sales/${e.detail[0]}`);
 	}
 
 	$: filterTable(keyword);
@@ -127,11 +165,11 @@
 
 <div class="card mb-4">
 	<header class="card-header">
-		<h1 class="h3">Users</h1>
+		<h1 class="h3">Sales Order</h1>
 	</header>
 	<section class="flex p-4 w-full gap-4">
 		<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
-			>Add User</button
+			>Add Sales Order</button
 		>
 		<input class="input ml-auto" type="text" placeholder="Search" bind:value={keyword} />
 	</section>
@@ -149,7 +187,7 @@
 	/>
 {/key}
 <Drawer>
-	{#if $drawerStore.id === 'createUser'}
-		<Create {drawerStore} {loadData} />
+	{#if $drawerStore.id === 'createSalesOrder'}
+		<Create {drawerStore} {loadData} {customerData} {productData} />
 	{/if}
 </Drawer>
