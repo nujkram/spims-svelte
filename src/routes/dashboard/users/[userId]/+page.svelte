@@ -73,7 +73,7 @@
 
 <Drawer>
     {#if $drawerStore.id === 'updateUser'}
-	<Update id={user?._id} {user} {drawerStore} />
+	<Update id={user?._id} moduleName={'users'} {user} {drawerStore} />
 	{:else if $drawerStore.id === 'resetPassword'}
 	<ResetPassword id={user?._id} {drawerStore} />
     {/if}

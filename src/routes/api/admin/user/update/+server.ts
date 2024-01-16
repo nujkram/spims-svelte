@@ -6,6 +6,11 @@ export async function POST({ request, locals }: any) {
 	const db = await clientPromise();
 	const User = db.collection('users');
 	
+    for (const key in data) {
+        if(key === '_id') continue;
+        if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
+    }
+
     const userUpdate = {
         $set: {
             updatedAt: new Date(),

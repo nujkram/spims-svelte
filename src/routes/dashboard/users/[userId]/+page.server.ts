@@ -6,7 +6,7 @@ export const ssr = false;
 export async function load({params}) {
     const {userId} = params;
     const db = await clientPromise();
-    const Users = db.collection('users');
+    const User = db.collection('users');
 
     const pipeline = [
       {
@@ -28,7 +28,7 @@ export async function load({params}) {
       }
     ];
     
-    const [user] = await Users.aggregate(pipeline).toArray();
+    const [user] = await User.aggregate(pipeline).toArray();
 
     return {user};
 }
