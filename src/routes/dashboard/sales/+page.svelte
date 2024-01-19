@@ -71,7 +71,7 @@
 		// Provide your property overrides:
 		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
 		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
-		width: 'w-[280px] md:w-[480px]',
+		width: 'w-[280px] md:w-[1920px]',
 		padding: 'p-4',
 		rounded: 'rounded-xl',
 		position: 'right'
@@ -106,16 +106,16 @@
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
 		table.body = tableMapperValues(paginatedData, [
-			'Customer',
-			'Addess',
-			'Description',
-			'OR No',
-			'Price',
-			'QTY',
-			'Amount',
-			'Downpayment',
-			'Balance',
-			'MOD'
+			'fullName',
+			'address',
+			'description',
+			'receipt',
+			'price',
+			'quantity',
+			'amount',
+			'downpayment',
+			'balance',
+			'paymentMethod'
 		]);
 		table.meta = tableMapperValues(paginatedData, [
 			'_id',
