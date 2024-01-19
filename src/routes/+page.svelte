@@ -24,7 +24,7 @@
 		}
 	}
 
-	function redirect() {
+	const redirect = () => {
 		goto('/dashboard');
 	}
 

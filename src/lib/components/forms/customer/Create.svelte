@@ -40,7 +40,7 @@
 	});
 
 	// autocomplete company selection event handler function to update company value on selection
-	function onCompanySelection(event: CustomEvent<AutocompleteOption<string>>): void {
+	const onCompanySelection = (event: CustomEvent<AutocompleteOption<string>>): void => {
 		company = event.detail.label;
 	}
 </script>

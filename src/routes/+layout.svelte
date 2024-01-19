@@ -33,7 +33,7 @@
 		placement: 'left'
 	};
 
-	function handleLogout() {
+	const handleLogout = () => {
 		goto('auth/logout/');
 	}
 
@@ -49,7 +49,7 @@
 
 	const drawerStore = getDrawerStore();
 
-	function drawerOpen(): void {
+	const drawerOpen = (): void => {
 		drawerStore.open(drawerSettings);
 	}
 </script>

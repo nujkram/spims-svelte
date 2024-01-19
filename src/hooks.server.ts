@@ -28,7 +28,7 @@ export const handle =async ({event, resolve}:{event: any; resolve: any}) => {
 }
 
 /** @type {import('@sveltejs/kit').HandleServerError} */
-export function handleError({ error }: { error: any }) {
+export const handleError = ({ error }: { error: any }) => {
 	// example integration with https://sentry.io/
 	// Sentry.captureException(error, { event });
 	console.error('⚡️ Dev. Unhandled Error', error);
