@@ -163,9 +163,9 @@
 			'',
 			'',
 			'',
-			`${formatCurrency(totalSales)}`,
-			`${formatCurrency(totalDownpayment)}`,
-			`${formatCurrency(totalBalance)}`,
+			`<div class="variant-filled-secondary px-2 rounded">${formatCurrency(totalSales)}</div>`,
+			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalDownpayment)}</div>`,
+			`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalBalance)}</div>`,
 			`<code class="code">${sourceData.length}</code>`
 		];
 	};
