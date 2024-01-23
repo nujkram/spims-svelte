@@ -1,7 +1,7 @@
 import clientPromise from '$lib/server/mongo';
 
 /** @type {import('./$types').RequestHandler} */
-export async function GET() {
+export const GET = async () => {
     const db = await clientPromise();
     const Products = db.collection('products');
 

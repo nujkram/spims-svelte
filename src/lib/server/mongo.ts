@@ -24,7 +24,7 @@ if (dev && uri?.includes('Test')) {
 	console.info('🚨 You are using Test database in development mode 🚨');
 }
 
-async function connectToDatabase() {
+const connectToDatabase = async () => {
 	if (cachedDb) return cachedDb;
 
 	const client = await MongoClient.connect(uri, options);

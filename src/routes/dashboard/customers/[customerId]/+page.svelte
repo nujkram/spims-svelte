@@ -37,10 +37,10 @@
 		<h1 class="h1">{customer?.fullName || 'NA'}</h1>
 		<h2 class="h2 italic">{customer?.company || 'NA'}</h2>
 		<div class="flex flex-col md:flex-row w-full gap-4 justify-between mt-4">
-            <div class="flex flex-col items-center">
-                <h3 class="h3">TIN</h3>
-                <p class="p">{customer?.tin || 'NA'}</p>
-            </div>
+			<div class="flex flex-col items-center">
+				<h3 class="h3">TIN</h3>
+				<p class="p">{customer?.tin || 'NA'}</p>
+			</div>
 			<div class="flex flex-col items-center">
 				<h3 class="h3">Email</h3>
 				<p class="p">{customer?.email || 'NA'}</p>

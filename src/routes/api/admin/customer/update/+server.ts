@@ -1,15 +1,15 @@
 import clientPromise from '$lib/server/mongo';
 
 /** @type {import('./$types').RequestHandler} */
-export async function POST({ request, locals }: any) {
-	const data = await request.json();
-	const db = await clientPromise();
-	const Customer = db.collection('customers');
+export const POST = async ({ request, locals }: any) => {
+    const data = await request.json();
+    const db = await clientPromise();
+    const Customer = db.collection('customers');
 
     for (const key in data) {
-        if(key === '_id') continue;
+        if (key === '_id') continue;
         if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
-        if(key === 'email') data[key] = data[key].toLowerCase();
+        if (key === 'email') data[key] = data[key].toLowerCase();
     }
 
     const customerUpdate = {
@@ -28,16 +28,15 @@ export async function POST({ request, locals }: any) {
         }
     }
 
-    console.log(data._id);
     const response = await Customer.updateOne({ _id: data._id }, customerUpdate);
 
-	if (response) {
-		return new Response(
-			JSON.stringify({
-				status: 'Success',
+    if (response) {
+        return new Response(
+            JSON.stringify({
+                status: 'Success',
                 message: 'Data updated successfully',
-				response
-			})
-		);
-	}
+                response
+            })
+        );
+    }
 }

@@ -5,7 +5,7 @@ import { createMachine } from 'xstate';
 import { writable } from 'svelte/store';
 import type { users } from '@prisma/client';
 
-export async function generateDisplayName(user: users) {
+export const generateDisplayName = async (user: users) => {
 	return user?.profile?.displayname || user?.profile.firstname + ' ' + user?.profile.lastname;
 }
 
@@ -17,7 +17,7 @@ export async function generateDisplayName(user: users) {
  * @param {Number} [n] Optional length of the identifier in characters
  *   (defaults to 17)
  */
-export function id(charsCount = 17) {
+export const id = (charsCount = 17) => {
 	// 17 characters is around 96 bits of entropy, which is the amount of
 	// state in the Alea PRNG.
 	if (charsCount === undefined) {
@@ -28,7 +28,7 @@ export function id(charsCount = 17) {
 }
 
 const UNMISTAKABLE_CHARS = '23456789ABCDEFGHJKLMNPQRSTWXYZabcdefghijkmnopqrstuvwxyz';
-function _randomString(charsCount: number, alphabet: string) {
+const _randomString = (charsCount: number, alphabet: string) => {
 	let result = '';
 	for (let i = 0; i < charsCount; i++) {
 		result += choice(alphabet);
@@ -42,7 +42,7 @@ function _randomString(charsCount: number, alphabet: string) {
  * @locus Anywhere
  * @param {Array|String} arrayOrString Array or string to choose from
  */
-function choice(arrayOrString: string | any[]) {
+const choice = (arrayOrString: string | any[]) => {
 	const index = Math.floor(Math.random() * arrayOrString.length);
 	if (typeof arrayOrString === 'string') {
 		return arrayOrString.substr(index, 1);
@@ -149,7 +149,7 @@ export const error = writable('');
  * @param defaultValue Final value to set for the final key in the hierarchy
  * @returns nested object
  */
-export function convertToNestedObject(str: string, defaultValue: string) {
+export const convertToNestedObject = (str: string, defaultValue: string) => {
 	// Split the input string on the "." character to create an array of keys
 	const keys = str.split('.');
 
@@ -172,7 +172,7 @@ export function convertToNestedObject(str: string, defaultValue: string) {
 	return nestedObj;
 }
 
-export async function secretGenerator(length: number) {
+export const secretGenerator = async (length: number) => {
 	let result = '';
 	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 	const charactersLength = characters.length;

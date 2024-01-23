@@ -2,7 +2,7 @@ import { hashPassword } from '$lib/common/utils';
 import clientPromise from '$lib/server/mongo';
 
 /** @type {import('./$types').RequestHandler} */
-export async function POST({ request, locals }: any) {
+export const POST = async ({ request, locals }: any) => {
 	const data = await request.json();
 	const db = await clientPromise();
 	const User = db.collection('users');

@@ -28,7 +28,7 @@
 	});
 
 	// autocomplete category selection event handler function to update category value on selection
-	function oncCategorySelection(event: CustomEvent<AutocompleteOption<string>>): void {
+	const onCategorySelection = (event: CustomEvent<AutocompleteOption<string>>): void => {
 		category = event.detail.label;
 	}
 </script>
@@ -46,10 +46,10 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					name: name,
-					price: price,
-					category: category,
-					status: status
+					name,
+					price,
+					status,
+					category
 				})
 			});
 
@@ -107,7 +107,7 @@
 				<Autocomplete
 					bind:input={category}
 					options={categoryOptions}
-					on:selection={oncCategorySelection}
+					on:selection={onCategorySelection}
 				/>
 			</div>
 		{/if}

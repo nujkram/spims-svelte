@@ -7,7 +7,7 @@
 
 	const urls: any = {
 		0: '/dashboard',
-		1: '/dashboard/orders',
+		1: '/dashboard/sales',
 		2: '/dashboard/purchase',
 		3: '/dashboard/products',
 		4: '/dashboard/customers',

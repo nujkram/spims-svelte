@@ -36,7 +36,7 @@
 			let result = await response.json();
 			sourceData = result.response;
 
-			updateTable(sourceData);
+			if(sourceData) updateTable(sourceData);
 		} catch (error) {
 			console.error(error);
 		}

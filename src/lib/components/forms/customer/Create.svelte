@@ -40,7 +40,7 @@
 	});
 
 	// autocomplete company selection event handler function to update company value on selection
-	function onCompanySelection(event: CustomEvent<AutocompleteOption<string>>): void {
+	const onCompanySelection = (event: CustomEvent<AutocompleteOption<string>>): void => {
 		company = event.detail.label;
 	}
 </script>
@@ -58,13 +58,13 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					lastName: lastName,
-					firstName: firstName,
-					address: address,
-					email: email,
-					phone: phone,
-					tin: tin,
-					company: company
+					lastName,
+					firstName,
+					address,
+					email,
+					phone,
+					tin,
+					company
 				})
 			});
 
