@@ -199,10 +199,10 @@
 	}
 
 	const salesData = (data: any) => {
+		totalSales = 0;
+		totalDownpayment = 0;
+		totalBalance = 0;
 		return data.map((item: any) => {
-			totalSales = 0;
-			totalDownpayment = 0;
-			totalBalance = 0;
 			totalSales += parseFloat(stringToDecimal(item.amount));
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
 			totalBalance +=
