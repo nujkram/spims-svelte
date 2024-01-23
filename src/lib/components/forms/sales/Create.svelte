@@ -138,7 +138,7 @@
 					const value = event.target.value;
 					const id = event.target.id;
 					const index = id.replace('quantities[', '').replace(']', '');
-					const price = sourceData[index].price;
+					const price = sourceData[index].price.replace(/,/g, '');
 					const subtotal = formatCurrencyNoSymbol(parseFloat(price) * parseFloat(value));
 					sourceData[index].subtotal = subtotal;
 
