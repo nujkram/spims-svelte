@@ -8,22 +8,23 @@
 		tableMapperValues
 	} from '@skeletonlabs/skeleton';
 	import type { AutocompleteOption, TableSource, ToastSettings } from '@skeletonlabs/skeleton';
+	import { formatCurrency, formatCurrencyNoSymbol } from '$lib/utils/currencyHelper';
 
 	export let loadData: () => void;
 	export let drawerStore = () => {};
 	export let customerData: any;
 	export let productData: any;
 
-	let receipt: string, downpayment: number, amount: number, customerId: any;
+	let receipt: string, downpayment: number, customerId: any;
 	let isFocused: boolean = true;
 	let customer: string = '';
 	let paymentMethod: string = 'Cash';
 	let customerOptions: any;
 	let product: string = '';
+	let amount: number = 0;
 	let productOptions: any;
 	let products: string[] = [];
-	let productDict: string[] = [];
-	let quantities: number[] = [];
+	let cart: string[] = [];
 	let sourceData: any = [];
 	const toastStore = getToastStore();
 	const toastSettings: ToastSettings = {
@@ -39,6 +40,7 @@
 	};
 
 	const updateTable = (sourceData: any) => {
+		amount = sourceData.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b.subtotal), 0);
 		if (!sourceData.length) {
 			table.body = [];
 			table.meta = [];
@@ -48,7 +50,12 @@
 		}
 		table.body = tableMapperValues(sourceData, ['name', 'price', 'quantity', 'subtotal']);
 		table.meta = tableMapperValues(sourceData, ['_id', 'price', 'quantity', 'subtotal']);
-		table.foot = ['Total', '', '', `<code class="code">${sourceData.length}</code>`];
+		table.foot = [
+			'Total',
+			'',
+			`<code class="code">${sourceData.length}</code>`,
+			`${formatCurrency(amount)}`
+		];
 	};
 
 	const uniqueCustomers = new Set(customerData.map((item: any) => [item.fullName, item._id]));
@@ -83,42 +90,67 @@
 	const onProductSelection = (event: CustomEvent<AutocompleteOption<string>>): void => {
 		const selectedProduct: any[] = [event.detail.value, event.detail.meta];
 		products = [...products, selectedProduct[0]];
-		let dict: any = {}
+		let dict: any = {};
 		let key = selectedProduct[1].id;
 		let value = {
 			name: selectedProduct[0],
 			price: selectedProduct[1].price
-		}
+		};
 		dict[key] = value;
-		productDict.push(dict);
+		cart.push(dict);
 		product = '';
 
 		// update cart table
 		let maxId = Math.max(...Object.keys(sourceData).map((key) => parseInt(key)));
 		let newId = Number.isFinite(maxId) ? maxId + 1 : 0;
 
+		const inputQuantity = document.createElement('input');
+		inputQuantity.setAttribute('class', 'input w-[80px] h-[30px]');
+		inputQuantity.setAttribute('id', `quantities[${newId}]`);
+		inputQuantity.setAttribute('type', 'number');
+		inputQuantity.setAttribute('name', 'quantities');
+		inputQuantity.setAttribute('value', '1');
+
 		sourceData[newId] = {
 			_id: selectedProduct[1].id,
 			name: selectedProduct[0],
-			price: selectedProduct[1].price,
-			quantity: `
-					<input 
-						class="input w-[80px] h-[30px]"
-						type="number"
-						name="quantities"
-						value=1
-					/>
-					`,
-			subtotal: selectedProduct[1].price
+			price: formatCurrencyNoSymbol(selectedProduct[1].price),
+			quantity: inputQuantity.outerHTML,
+			subtotal: formatCurrencyNoSymbol(selectedProduct[1].price)
 		};
 		updateTable(sourceData);
+		quantityEventListener();
 	};
 
 	// product input chip event handler
 	const onRemoveProduct = (e: { detail: { chipIndex: number } }) => {
 		sourceData.splice(e.detail.chipIndex, 1);
-		productDict.splice(e.detail.chipIndex, 1);
+		cart.splice(e.detail.chipIndex, 1);
 		updateTable(sourceData);
+	};
+
+	const quantityEventListener = () => {
+		setTimeout(() => {
+			const inputQuantities = document.querySelectorAll('[name="quantities"]');
+			inputQuantities.forEach((input) => {
+				input.addEventListener('change', (event) => {
+					// get event target value
+					const value = event.target.value;
+					const id = event.target.id;
+					const index = id.replace('quantities[', '').replace(']', '');
+					const price = sourceData[index].price;
+					const subtotal = formatCurrencyNoSymbol(price * value);
+					sourceData[index].subtotal = subtotal;
+
+					// set the subtotal to the cart
+					const product = Object.keys(cart[index]);
+					const productId: any = product[0].toString();
+					cart[index][productId].subtotal = subtotal;
+
+					updateTable(sourceData);
+				});
+			});
+		}, 1000);
 	};
 </script>
 
@@ -134,26 +166,37 @@
 			let formData = new FormData(form);
 			const inputs = document.querySelectorAll('[name]');
 
-			// TODO: Get all quantities from input field
-			inputs.forEach((input) => {
-				console.log(input.name, input.value);
-				formData.append(input.name, input.value);
+			// Add the quantities to the form data
+			const quantities = Array.from(inputs)
+				.map((input) => {
+					formData.append(input.name, input.value);
+					return input.name === 'quantities' ? input.value : null;
+				})
+				.filter((value) => value !== null);
+
+			// Add quantity to each product
+			cart = cart.map((product, index) => {
+				const productId = Object.keys(product)[0];
+				const quantity = quantities[index];
+
+				// Add the quantity to the product
+				product[productId].quantity = quantity;
+				return product;
 			});
 
-			console.log('formData', formData);
 			let response = await fetch('/api/admin/sales/insert', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
+					customerId,
+					customer,
 					receipt,
-					downpayment,
+					downpayment: formatCurrencyNoSymbol(downpayment),
 					paymentMethod,
 					amount,
-					customerId,
-					productDict,
-					quantities,
+					cart
 				})
 			});
 
@@ -171,7 +214,7 @@
 		}
 	}}
 >
-	<div class="grid md:grid-cols-3 grid-cols-1">
+	<div class="grid md:grid-cols-4 grid-cols-1">
 		<div class="col-span-1 p-6 flex flex-col gap-4">
 			<h2 class="h4">Create Sales Order</h2>
 			<label class="label">
@@ -227,9 +270,8 @@
 				</select>
 			</label>
 		</div>
-		<div class="col-span-2 p-6 flex flex-col gap-4">
-			<h2 class="h4">Cart</h2>
-			<Table class="mt-4" source={table} />
+		<div class="col-span-1 p-6 flex flex-col gap-4">
+			<h2 class="h4">Products</h2>
 			<div class="mt-3">
 				<span>Products</span>
 				<InputChip
@@ -248,6 +290,10 @@
 					/>
 				</div>
 			</div>
+		</div>
+		<div class="col-span-2 p-6 flex flex-col gap-4">
+			<h2 class="h4">Cart</h2>
+			<Table class="mt-4" source={table} />
 		</div>
 	</div>
 	<div class="flex gap-4 place-content-end w-full">

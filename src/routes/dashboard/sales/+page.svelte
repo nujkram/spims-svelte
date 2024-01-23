@@ -10,35 +10,42 @@
 	import type { DrawerSettings, PaginationSettings, TableSource } from '@skeletonlabs/skeleton';
 	import Create from '$lib/components/forms/sales/Create.svelte';
 	import { goto } from '$app/navigation';
+	import { formatCurrency, formatCurrencyNoSymbol } from '$lib/utils/currencyHelper';
+	import dateToString from '$lib/utils/dateHelper';
 
 	let keyword: string = '';
+	let startDate: string = '';
+	let endDate: string = '';
 
 	let sourceData: any = [];
 	let customerData: any = [];
 	let productData: any = [];
-	
+	let totalSales: number = 0;
+	let totalDownpayment: number = 0;
+	let totalBalance: number = 0;
+
 	let table: TableSource = {
 		// A list of heading labels.
 		head: [
+			'Date',
 			'Customer',
+			'Company',
 			'Addess',
 			'Description',
 			'OR No',
-			'Price',
-			'QTY',
 			'Amount',
-			'Downpayment',
+			'DP',
 			'Balance',
 			'MOD'
 		],
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, [
-			'fullName',
+			'createdAt',
+			'customer',
+			'company',
 			'address',
 			'description',
 			'receipt',
-			'price',
-			'quantity',
 			'amount',
 			'downpayment',
 			'balance',
@@ -60,7 +67,8 @@
 			customerData = result.response.customers;
 			productData = result.response.products;
 
-			if(sourceData) updateTable(sourceData);
+			salesData(sourceData);
+			if (sourceData) updateTable(sourceData);
 		} catch (error) {
 			console.error(error);
 		}
@@ -82,14 +90,13 @@
 
 	const filterTable = (keyword: string) => {
 		paginationSettings.page = 0;
+		let tempData = salesData(sourceData);
 		if (keyword.length > 0) {
-			let filteredData = sourceData.filter((item: any) => {
+			let filteredData = tempData.filter((item: any) => {
 				return (
-					item.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
-					item.address.toLowerCase().includes(keyword.toLowerCase()) ||
-					item.company.toLowerCase().includes(keyword.toLowerCase()) ||
-					item.email.toLowerCase().includes(keyword.toLowerCase()) ||
-					item.phone.toLowerCase().includes(keyword.toLowerCase())
+					item.customer.includes(keyword.toUpperCase()) ||
+					item.address.includes(keyword.toUpperCase()) ||
+					item.company.includes(keyword.toUpperCase())
 				);
 			});
 
@@ -99,37 +106,59 @@
 		}
 	};
 
+	// filter sourceData createdAt by date between start and end
+	const filterByDate = (start: Date, end: Date) => {
+		paginationSettings.page = 0;
+		let tempData = salesData(sourceData);
+		let filteredData = tempData.filter((item: any) => {
+			return new Date(item.createdAt) >= start && new Date(item.createdAt) <= end;
+		});
+		updateTable(filteredData);
+	};
+
 	const updateTable = (sourceData: any) => {
+		sourceData = salesData(sourceData);
 		paginationSettings.size = sourceData.length;
 		let paginatedData = sourceData.slice(
 			paginationSettings.page * paginationSettings.limit,
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
 		table.body = tableMapperValues(paginatedData, [
-			'fullName',
+			'createdAt',
+			'customer',
+			'company',
 			'address',
 			'description',
 			'receipt',
-			'price',
-			'quantity',
 			'amount',
 			'downpayment',
 			'balance',
 			'paymentMethod'
 		]);
 		table.meta = tableMapperValues(paginatedData, [
+			'createdAt',
 			'_id',
+			'company',
 			'address',
 			'description',
 			'receipt',
-			'price',
-			'quantity',
 			'amount',
 			'downpayment',
 			'balance',
 			'paymentMethod'
 		]);
-		table.foot = ['Total', '', '', '', '', '', '', '', '', `<code class="code">${sourceData.length}</code>`];
+		table.foot = [
+			'Total',
+			'',
+			'',
+			'',
+			'',
+			'',
+			`${formatCurrency(totalSales)}`,
+			`${formatCurrency(totalDownpayment)}`,
+			`${formatCurrency(totalBalance)}`,
+			`<code class="code">${sourceData.length}</code>`
+		];
 	};
 
 	let paginationSettings = {
@@ -160,7 +189,33 @@
 		goto(`/dashboard/sales/${e.detail[0]}`);
 	}
 
+	const salesData = (data: any) => {
+		return data.map((item: any) => {
+			totalSales = 0;
+			totalDownpayment = 0;
+			totalBalance = 0;
+			totalSales += parseFloat(item.amount);
+			totalDownpayment += parseFloat(item.downpayment);
+			totalBalance += parseFloat(item.amount) - parseFloat(item.downpayment);
+			return {
+				...item,
+				customer:
+					customerData.find((customer: any) => customer._id === item.customerId).fullName || '',
+				address:
+					customerData.find((customer: any) => customer._id === item.customerId).address || '',
+				company:
+					customerData.find((customer: any) => customer._id === item.customerId).company || '',
+				description: item.cart.map((cart: any) => {
+					return ` [${cart.name}, ${cart.price} x ${cart.quantity} = ${cart.subtotal || 0.0}]`;
+				}),
+				balance: formatCurrencyNoSymbol(parseFloat(item.amount) - parseFloat(item.downpayment)),
+				createdAt: dateToString(item.createdAt)
+			};
+		});
+	};
+
 	$: filterTable(keyword);
+	$: filterByDate(new Date(startDate), new Date(endDate));
 </script>
 
 <div class="card mb-4">
@@ -169,9 +224,42 @@
 	</header>
 	<section class="flex p-4 w-full gap-4">
 		<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
-			>Add Sales Order</button
+			>Add <br />Sales Order</button
 		>
-		<input class="input ml-auto" type="text" placeholder="Search" bind:value={keyword} />
+		<label class="label flex-auto">
+			<span>Search</span>
+			<input
+				class="input"
+				type="text"
+				placeholder="Search by customer, company, or address"
+				name="keyword"
+				bind:value={keyword}
+				on:input={() => filterTable(keyword)}
+			/>
+		</label>
+		<!-- start date field and end date field -->
+		<div class="flex gap-4">
+			<label class="label">
+				<span>Start Date</span>
+				<input
+					class="input"
+					type="date"
+					name="startDate"
+					bind:value={startDate}
+					on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
+				/>
+			</label>
+			<label class="label">
+				<span>End Date</span>
+				<input
+					class="input"
+					type="date"
+					name="endDate"
+					bind:value={endDate}
+					on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
+				/>
+			</label>
+		</div>
 	</section>
 </div>
 

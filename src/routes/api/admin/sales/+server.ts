@@ -7,11 +7,60 @@ export const GET = async () => {
     const Customers = db.collection('customers');
     const Products = db.collection('products');
 
-    const sales = await Sales.find({}).sort({ createdAt: -1 }).toArray();
     const customers = await Customers.find({}).sort({ createdAt: -1 }).toArray();
     const products = await Products.find({}).sort({ createdAt: -1 }).toArray();
 
-    if(sales) {
+    const pipeline = [
+        {
+            $lookup: {
+                from: 'customers',
+                localField: 'customerId',
+                foreignField: '_id',
+                as: 'customer'
+            },
+        },
+        {
+            $lookup: {
+                'from': 'users',
+                'localField': 'createdBy',
+                'foreignField': '_id',
+                'as': 'createdBy'
+            },
+        },
+        {
+            $lookup: {
+                'from': 'users',
+                'localField': 'updatedBy',
+                'foreignField': '_id',
+                'as': 'updatedBy'
+            },
+        },
+        {
+            $unwind: {
+                path: '$customer',
+                preserveNullAndEmptyArrays: true
+            },
+        },
+        {
+            $unwind: {
+                path: '$createdBy',
+                preserveNullAndEmptyArrays: true
+            },
+        },
+        {
+            $unwind: {
+                path: '$updatedBy',
+                preserveNullAndEmptyArrays: true
+            },
+        },
+        {
+            $sort: { createdAt: -1 }
+        }
+    ]
+
+    const sales = await Sales.aggregate(pipeline).toArray();
+
+    if (sales) {
         return new Response(
             JSON.stringify({
                 status: 'Success',
