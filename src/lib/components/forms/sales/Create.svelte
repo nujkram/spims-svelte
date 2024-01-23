@@ -139,7 +139,7 @@
 					const id = event.target.id;
 					const index = id.replace('quantities[', '').replace(']', '');
 					const price = sourceData[index].price;
-					const subtotal = formatCurrencyNoSymbol(price * value);
+					const subtotal = formatCurrencyNoSymbol(parseFloat(price) * parseFloat(value));
 					sourceData[index].subtotal = subtotal;
 
 					// set the subtotal to the cart
