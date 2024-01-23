@@ -10,7 +10,11 @@
 	import type { DrawerSettings, PaginationSettings, TableSource } from '@skeletonlabs/skeleton';
 	import Create from '$lib/components/forms/sales/Create.svelte';
 	import { goto } from '$app/navigation';
-	import { formatCurrency, formatCurrencyNoSymbol } from '$lib/utils/currencyHelper';
+	import {
+		formatCurrency,
+		formatCurrencyNoSymbol,
+		stringToDecimal
+	} from '$lib/utils/currencyHelper';
 	import dateToString from '$lib/utils/dateHelper';
 
 	let keyword: string = '';
@@ -28,6 +32,7 @@
 		// A list of heading labels.
 		head: [
 			'Date',
+			'Business',
 			'Customer',
 			'Company',
 			'Addess',
@@ -41,6 +46,7 @@
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, [
 			'createdAt',
+			'business',
 			'customer',
 			'company',
 			'address',
@@ -125,6 +131,7 @@
 		);
 		table.body = tableMapperValues(paginatedData, [
 			'createdAt',
+			'business',
 			'customer',
 			'company',
 			'address',
@@ -137,6 +144,7 @@
 		]);
 		table.meta = tableMapperValues(paginatedData, [
 			'createdAt',
+			'business',
 			'_id',
 			'company',
 			'address',
@@ -149,6 +157,7 @@
 		]);
 		table.foot = [
 			'Total',
+			'',
 			'',
 			'',
 			'',
@@ -186,7 +195,7 @@
 
 	// table row select handler
 	function tableSelectHandler(e: CustomEvent): void {
-		goto(`/dashboard/sales/${e.detail[0]}`);
+		goto(`/dashboard/sales/${e.detail[2]}`);
 	}
 
 	const salesData = (data: any) => {
@@ -194,9 +203,15 @@
 			totalSales = 0;
 			totalDownpayment = 0;
 			totalBalance = 0;
-			totalSales += parseFloat(item.amount);
-			totalDownpayment += parseFloat(item.downpayment);
-			totalBalance += parseFloat(item.amount) - parseFloat(item.downpayment);
+			totalSales += parseFloat(stringToDecimal(item.amount));
+			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
+			totalBalance +=
+				parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment));
+			console.log(
+				formatCurrencyNoSymbol(
+					parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment))
+				)
+			);
 			return {
 				...item,
 				customer:
@@ -208,7 +223,11 @@
 				description: item.cart.map((cart: any) => {
 					return ` [${cart.name}, ${cart.price} x ${cart.quantity} = ${cart.subtotal || 0.0}]`;
 				}),
-				balance: formatCurrencyNoSymbol(parseFloat(item.amount) - parseFloat(item.downpayment)),
+				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
+				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
+				balance: formatCurrencyNoSymbol(
+					parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment))
+				),
 				createdAt: dateToString(item.createdAt)
 			};
 		});

@@ -14,3 +14,8 @@ export const formatCurrencyNoSymbol = (value, locale = 'en-PH') => {
         maximumFractionDigits: 2
     }).format(value);
 }
+
+export const stringToDecimal = (value: any) => {
+    if (typeof value !== 'string') return value;
+    return parseFloat(value.replace(/,/g, ''));
+}
