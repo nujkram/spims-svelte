@@ -14,7 +14,7 @@ export const intToTime = (i:number) => {
 	return `${i > 12 ? i - 12 : i}:00 ${i < 12 ? 'AM' : i === 24 ? 'AM' : 'PM'}`;
 }
 
-export const intToUTCText = (i:number) {
+export const intToUTCText = (i:number) => {
 	let utcText = 'UTC';
 	if (i > 0) {
 		utcText = `UTC +${i}`;
