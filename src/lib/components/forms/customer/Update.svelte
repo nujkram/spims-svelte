@@ -32,7 +32,7 @@
 	// autocomplete company selection event handler function to update company value on selection
 	const onCompanySelection = (event: CustomEvent<AutocompleteOption<string>>): void => {
 		company = event.detail.label;
-	}
+	};
 </script>
 
 <form
@@ -48,7 +48,7 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-                    _id: id,
+					_id: id,
 					lastName: customer?.lastName,
 					firstName: customer?.firstName,
 					address: customer?.address,
@@ -151,7 +151,7 @@
 		/>
 	</label>
 	{#key company}
-		{#if company.length > 0 && companyOptions.length > 0}
+		{#if company?.length > 0 && companyOptions?.length > 0}
 			<div class="card w-full max-w-sm max-h-48 p-4 my-4 overflow-y-auto" tabindex="-1">
 				<Autocomplete
 					bind:input={company}
