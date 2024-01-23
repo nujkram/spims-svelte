@@ -102,7 +102,8 @@
 		let key = selectedProduct[1].id;
 		let value = {
 			name: selectedProduct[0],
-			price: selectedProduct[1].price
+			price: selectedProduct[1].price,
+			subtotal: selectedProduct[1].price
 		};
 		dict[key] = value;
 		cart.push(dict);
