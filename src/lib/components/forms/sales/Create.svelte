@@ -8,7 +8,11 @@
 		tableMapperValues
 	} from '@skeletonlabs/skeleton';
 	import type { AutocompleteOption, TableSource, ToastSettings } from '@skeletonlabs/skeleton';
-	import { formatCurrency, formatCurrencyNoSymbol } from '$lib/utils/currencyHelper';
+	import {
+		formatCurrency,
+		formatCurrencyNoSymbol,
+		stringToDecimal
+	} from '$lib/utils/currencyHelper';
 
 	export let loadData: () => void;
 	export let drawerStore = () => {};
@@ -26,6 +30,7 @@
 	let products: string[] = [];
 	let cart: string[] = [];
 	let sourceData: any = [];
+	let business: string = 'RAC';
 	const toastStore = getToastStore();
 	const toastSettings: ToastSettings = {
 		message: '',
@@ -41,7 +46,7 @@
 
 	const updateTable = (sourceData: any) => {
 		amount = sourceData.reduce(
-			(a: any, b: any) => parseFloat(a) + parseFloat(b.subtotal.replace(/,/g, '')),
+			(a: any, b: any) => parseFloat(a) + parseFloat(stringToDecimal(b.subtotal)),
 			0
 		);
 		if (!sourceData.length) {
@@ -117,14 +122,10 @@
 		sourceData[newId] = {
 			_id: selectedProduct[1].id,
 			name: selectedProduct[0],
-			price: formatCurrencyNoSymbol(selectedProduct[1].price.replace(/,/g, '')),
+			price: formatCurrencyNoSymbol(stringToDecimal(selectedProduct[1].price)),
 			quantity: inputQuantity.outerHTML,
-			subtotal: formatCurrencyNoSymbol(selectedProduct[1].price.replace(/,/g, ''))
+			subtotal: formatCurrencyNoSymbol(stringToDecimal(selectedProduct[1].price))
 		};
-		console.log(
-			'selectedProduct[1].price.replace(/,/g, "")',
-			selectedProduct[1].price.replace(/,/g, '')
-		);
 		updateTable(sourceData);
 		quantityEventListener();
 	};
@@ -145,7 +146,7 @@
 					const value = event.target.value;
 					const id = event.target.id;
 					const index = id.replace('quantities[', '').replace(']', '');
-					const price = sourceData[index].price.replace(/,/g, '');
+					const price = stringToDecimal(sourceData[index].price);
 					const subtotal = formatCurrencyNoSymbol(parseFloat(price) * parseFloat(value));
 					sourceData[index].subtotal = subtotal;
 
@@ -203,7 +204,8 @@
 					downpayment: formatCurrencyNoSymbol(downpayment),
 					paymentMethod,
 					amount,
-					cart
+					cart,
+					business
 				})
 			});
 
@@ -224,6 +226,14 @@
 	<div class="grid md:grid-cols-4 grid-cols-1">
 		<div class="col-span-1 p-6 flex flex-col gap-4">
 			<h2 class="h4">Create Sales Order</h2>
+			<!-- dropdown business -->
+			<label class="label">
+				<span>Business</span>
+				<select class="select" bind:value={business}>
+					<option value="RAC">RAC</option>
+					<option value="DTF">DTF</option>
+				</select>
+			</label>
 			<label class="label">
 				<span>Customer</span>
 				<input
