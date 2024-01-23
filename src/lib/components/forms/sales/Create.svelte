@@ -40,7 +40,10 @@
 	};
 
 	const updateTable = (sourceData: any) => {
-		amount = sourceData.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b.subtotal), 0);
+		amount = sourceData.reduce(
+			(a: any, b: any) => parseFloat(a) + parseFloat(b.subtotal.replace(/,/g, '')),
+			0
+		);
 		if (!sourceData.length) {
 			table.body = [];
 			table.meta = [];
@@ -114,10 +117,14 @@
 		sourceData[newId] = {
 			_id: selectedProduct[1].id,
 			name: selectedProduct[0],
-			price: formatCurrencyNoSymbol(selectedProduct[1].price),
+			price: formatCurrencyNoSymbol(selectedProduct[1].price.replace(/,/g, '')),
 			quantity: inputQuantity.outerHTML,
-			subtotal: formatCurrencyNoSymbol(selectedProduct[1].price)
+			subtotal: formatCurrencyNoSymbol(selectedProduct[1].price.replace(/,/g, ''))
 		};
+		console.log(
+			'selectedProduct[1].price.replace(/,/g, "")',
+			selectedProduct[1].price.replace(/,/g, '')
+		);
 		updateTable(sourceData);
 		quantityEventListener();
 	};
