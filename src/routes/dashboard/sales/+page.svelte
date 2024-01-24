@@ -207,11 +207,7 @@
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
 			totalBalance +=
 				parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment));
-			console.log(
-				formatCurrencyNoSymbol(
-					parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment))
-				)
-			);
+
 			return {
 				...item,
 				customer:

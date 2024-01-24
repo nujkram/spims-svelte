@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Avatar, Drawer, getDrawerStore, getToastStore } from '@skeletonlabs/skeleton';
-	import type { DrawerSettings, ToastSettings } from '@skeletonlabs/skeleton';
+	import { Avatar, Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
+	import type { DrawerSettings } from '@skeletonlabs/skeleton';
 	import Update from '$lib/components/forms/customer/Update.svelte';
 	import dateToString from '$lib/utils/dateHelper';
 	export let data;
