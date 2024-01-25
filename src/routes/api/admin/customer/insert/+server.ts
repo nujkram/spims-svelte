@@ -14,6 +14,7 @@ export const POST = async ({ request, locals }: any) => {
 
     data._id = id();
     data.fullName = `${data.firstName} ${data.lastName}`;
+    data.isActive = true;
     data.createdAt = new Date();
     data.createdBy = locals.user._id;
     data.updatedBy = locals.user._id;

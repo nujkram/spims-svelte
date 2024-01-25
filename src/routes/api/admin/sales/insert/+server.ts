@@ -17,6 +17,7 @@ export const POST = async ({ request, locals }: any) => {
             createdAt: new Date(),
             createdBy: locals.user._id,
             updatedBy: locals.user._id,
+            isActive: true,
             fullName: data.customer
         }
         await Customers.insertOne(newCustomer);
