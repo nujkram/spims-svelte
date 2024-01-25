@@ -12,6 +12,11 @@ export const GET = async () => {
 
     const pipeline = [
         {
+            $match: {
+                isActive: true,
+            }
+        },
+        {
             $lookup: {
                 from: 'customers',
                 localField: 'customerId',

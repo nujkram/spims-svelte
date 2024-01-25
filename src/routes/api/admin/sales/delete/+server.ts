@@ -4,20 +4,21 @@ import clientPromise from '$lib/server/mongo';
 export const POST = async ({ request, locals }: any) => {
     const data = await request.json();
     const db = await clientPromise();
-    const Customer = db.collection('customers');
+    const Sales = db.collection('sales');
 
     data.isDeleted = true;
     data.deletedAt = new Date();
     data.isActive = false;
     data.deletedBy = locals.user._id;
 
-    const response = await Customer.updateOne({ _id: data._id }, { $set: data });
+    const response = await Sales.updateOne({ _id: data._id }, { $set: data });
+    // const response = await Sales.deleteOne({ _id: data._id });
 
     if (response) {
         return new Response(
             JSON.stringify({
                 success: true,
-                message: 'Customer delete successfully',
+                message: 'Sales delete successfully',
                 data: response
             }),
             {
@@ -30,7 +31,7 @@ export const POST = async ({ request, locals }: any) => {
         return new Response(
             JSON.stringify({
                 success: false,
-                message: 'Failed to delete customer',
+                message: 'Failed to delete sales',
                 data: response
             }),
             {

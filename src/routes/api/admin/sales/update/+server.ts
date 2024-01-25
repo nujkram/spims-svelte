@@ -33,6 +33,7 @@ export const POST = async ({ request, locals }: any) => {
             paymentMethod: data.paymentMethod,
             amount: data.amount,
             cart: data.cart,
+            business: data.business,
             updatedBy: locals.user._id
         }
     }

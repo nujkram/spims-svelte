@@ -1,17 +1,46 @@
 <script lang="ts">
-	import { Avatar, Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
-	import type { DrawerSettings } from '@skeletonlabs/skeleton';
+	import {
+		Avatar,
+		Drawer,
+		getDrawerStore,
+		getToastStore,
+		Table,
+		tableMapperValues
+	} from '@skeletonlabs/skeleton';
+	import type { DrawerSettings, TableSource, ToastSettings } from '@skeletonlabs/skeleton';
 	import Update from '$lib/components/forms/sales/Update.svelte';
 	import dateToString from '$lib/utils/dateHelper';
 	import { formatCurrency, stringToDecimal } from '$lib/utils/currencyHelper.js';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	export let data;
 
 	let { sales } = data;
 	let sourceData: any = [];
 	let customerData: any = [];
 	let productData: any = [];
-	let cart = sales?.cart;
+	let cartData: any = [];
+	let table: TableSource = {
+		head: ['Name', 'Price', 'Quantity', 'Total'],
+		body: tableMapperValues(sales?.cart, ['name', 'price', 'quantity', 'subtotal']),
+		foot: ['Total', '', '', formatCurrency(sales?.amount)]
+	};
+
+	const toastStore = getToastStore();
+	const toastSettings: ToastSettings = {
+		message: '',
+		timeout: 5000
+	};
+
+	const confirmSettings: ToastSettings = {
+		message: 'This action is irreversible. Are you sure you want to delete this record?',
+		background: 'bg-yellow-600',
+		action: {
+			label: 'Yes',
+			response: () => handleDelete()
+		},
+		timeout: 8000
+	};
 
 	// drawer settings
 	const drawerUpdate: DrawerSettings = {
@@ -47,7 +76,32 @@
 			sourceData = result.response.sales;
 			customerData = result.response.customers;
 			productData = result.response.products;
+			cartData = sourceData?.cart;
 		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	const handleDelete = async () => {
+		try {
+			let response = await fetch('/api/admin/sales/delete', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ _id: sales?._id })
+			});
+
+			let result = await response.json();
+
+			toastSettings.message = result.message;
+			toastStore.trigger(toastSettings);
+			goto('/dashboard/sales');
+		}
+		catch (error) {
+			toastSettings.message = error.message;
+			toastSettings.background = 'bg-red-500';
+			toastStore.trigger(toastSettings);
 			console.error(error);
 		}
 	}
@@ -140,10 +194,14 @@
 				<p class="p">{sales?.updatedBy.fullName || 'NA'}</p>
 			</div>
 		</div>
+		<div class="flex w-full mt-6">
+			<Table source={table} />
+		</div>
 	</section>
 	<footer class="card-footer flex justify-end border-t-2 p-4">
 		<div class="btn-group variant-filled overflow-auto">
 			<button type="button" on:click={() => drawerStore.open(drawerUpdate)}>Edit</button>
+			<button type="button" on:click={() => toastStore.trigger(confirmSettings)}>Delete</button>
 			<button type="button" on:click={() => window.history.back()}>Close</button>
 		</div>
 	</footer>
