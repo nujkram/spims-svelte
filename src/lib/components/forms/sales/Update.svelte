@@ -13,24 +13,28 @@
 		formatCurrencyNoSymbol,
 		stringToDecimal
 	} from '$lib/utils/currencyHelper';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	export let loadData: () => void;
 	export let drawerStore = () => {};
+	export let moduleName: string;
+	export let sales: any;
+	export let customer: any;
+	export let id: string;
 	export let customerData: any;
 	export let productData: any;
 
-	let receipt: string, downpayment: number, customerId: any;
+	let customerId: any = sales?.customer?._id;
 	let isFocused: boolean = true;
-	let customer: string = '';
-	let paymentMethod: string = 'Cash';
 	let customerOptions: any;
 	let product: string = '';
 	let amount: number = 0;
 	let productOptions: any;
 	let products: string[] = [];
-	let cart: string[] = [];
 	let sourceData: any = [];
-	let business: string = 'RAC';
+	let business: string = sales?.business;
+	let cart = sales?.cart;
 	const toastStore = getToastStore();
 	const toastSettings: ToastSettings = {
 		message: '',
@@ -160,6 +164,39 @@
 			});
 		}, 1000);
 	};
+
+	const loadCart = async () => {
+		await cart.forEach((item: any) => {
+			// update cart table
+			let maxId = Math.max(...Object.keys(sourceData).map((key) => parseInt(key)));
+			let newId = Number.isFinite(maxId) ? maxId + 1 : 0;
+
+			const inputQuantity = document.createElement('input');
+			inputQuantity.setAttribute('class', 'input w-[80px] h-[30px]');
+			inputQuantity.setAttribute('id', `quantities[${newId}]`);
+			inputQuantity.setAttribute('type', 'number');
+			inputQuantity.setAttribute('name', 'quantities');
+			inputQuantity.setAttribute('value', item?.quantity || '1');
+
+			sourceData[newId] = {
+				_id: item.id,
+				name: item.name,
+				price: formatCurrencyNoSymbol(stringToDecimal(item.price)),
+				quantity: inputQuantity.outerHTML,
+				subtotal: formatCurrencyNoSymbol(stringToDecimal(item.subtotal))
+			};
+
+			products = [...products, item.name];
+			updateTable(sourceData);
+			quantityEventListener();
+		});
+	};
+
+	onMount(async () => {
+		cart = sales?.cart;
+
+		await loadCart();
+	});
 </script>
 
 <form
@@ -190,17 +227,18 @@
 				return product;
 			});
 
-			let response = await fetch('/api/admin/sales/insert', {
+			let response = await fetch('/api/admin/sales/update', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
+					_id: id,
 					customerId,
 					customer,
-					receipt,
-					downpayment: formatCurrencyNoSymbol(downpayment),
-					paymentMethod,
+					receipt: sales?.receipt,
+					downpayment: formatCurrencyNoSymbol(sales?.downpayment),
+					paymentMethod: sales?.paymentMethod,
 					amount,
 					cart,
 					business
@@ -211,8 +249,7 @@
 
 			toastSettings.message = result.message;
 			toastStore.trigger(toastSettings);
-			loadData();
-			drawerStore.close();
+			goto(`/dashboard/${moduleName}`);
 		} catch (error) {
 			toastSettings.message = error.message;
 			toastSettings.background = 'bg-red-500';
@@ -223,7 +260,7 @@
 >
 	<div class="grid md:grid-cols-4 grid-cols-1">
 		<div class="col-span-1 p-6 flex flex-col gap-4">
-			<h2 class="h4">Create Sales Order</h2>
+			<h2 class="h4">Update Sales Order</h2>
 			<!-- dropdown business -->
 			<label class="label">
 				<span>Business</span>
@@ -261,7 +298,7 @@
 					type="text"
 					placeholder="123456789"
 					name="receipt"
-					bind:value={receipt}
+					bind:value={sales.receipt}
 					required
 				/>
 			</label>
@@ -272,13 +309,13 @@
 					type="number"
 					placeholder="0.00"
 					name="downpayment"
-					bind:value={downpayment}
+					bind:value={sales.downpayment}
 					required
 				/>
 			</label>
 			<label class="label">
 				<span>Payment Method</span>
-				<select class="select" bind:value={paymentMethod}>
+				<select class="select" bind:value={sales.paymentMethod}>
 					<option value="Cash">Cash</option>
 					<option value="Online Payment">Online Payment</option>
 					<option value="Bank Transaction">Bank Transaction</option>
@@ -313,8 +350,12 @@
 	</div>
 	<div class="flex gap-4 place-content-end w-full">
 		<button type="submit" class="btn variant-filled-success mt-4">Submit</button>
-		<button type="button" class="btn variant-filled mt-4" on:click={() => drawerStore.close()}
-			>Cancel</button
+		<button
+			type="button"
+			class="btn variant-filled mt-4"
+			on:click={() => {
+				drawerStore.close();
+			}}>Cancel</button
 		>
 	</div>
 </form>

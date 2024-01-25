@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Avatar, Drawer, getDrawerStore, getToastStore } from '@skeletonlabs/skeleton';
-	import type { DrawerSettings, ToastSettings } from '@skeletonlabs/skeleton';
+	import { Avatar, Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
+	import type { DrawerSettings } from '@skeletonlabs/skeleton';
 	import Update from '$lib/components/forms/user/Update.svelte';
 	import ResetPassword from '$lib/components/forms/user/ResetPassword.svelte';
 	export let data;

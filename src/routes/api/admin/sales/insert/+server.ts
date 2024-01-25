@@ -17,6 +17,7 @@ export const POST = async ({ request, locals }: any) => {
             createdAt: new Date(),
             createdBy: locals.user._id,
             updatedBy: locals.user._id,
+            isActive: true,
             fullName: data.customer
         }
         await Customers.insertOne(newCustomer);
@@ -25,20 +26,11 @@ export const POST = async ({ request, locals }: any) => {
 
     data._id = id();
     data.createdAt = new Date();
+    data.updatedAt = new Date();
     data.createdBy = locals.user._id;
     data.updatedBy = locals.user._id;
 
     if (data) {
-        
-        // extract cart items
-        const cartItems = data.cart.map(item => {
-            const product = Object.values(item)[0];
-            return product;
-        })
-
-        delete data.cart;
-        data.cart = cartItems;
-        
         const response = await Sales.insertOne(data);
         return new Response(
             JSON.stringify({

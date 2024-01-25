@@ -1,19 +1,17 @@
 import clientPromise from '$lib/server/mongo';
 
-/** @type {import('./$types').RequestHandler} */
-export const GET = async () => {
+export const ssr = false;
+
+/** @type {import('./$types').PageServerLoad} */
+export async function load({ params }) {
+    const { salesId } = params;
     const db = await clientPromise();
     const Sales = db.collection('sales');
-    const Customers = db.collection('customers');
-    const Products = db.collection('products');
-
-    const customers = await Customers.find({}).sort({ createdAt: -1 }).toArray();
-    const products = await Products.find({}).sort({ createdAt: -1 }).toArray();
 
     const pipeline = [
         {
             $match: {
-                isActive: true,
+                _id: salesId
             }
         },
         {
@@ -63,18 +61,8 @@ export const GET = async () => {
         }
     ]
 
-    const sales = await Sales.aggregate(pipeline).toArray();
 
-    if (sales) {
-        return new Response(
-            JSON.stringify({
-                status: 'Success',
-                response: {
-                    sales,
-                    customers,
-                    products
-                }
-            })
-        )
-    }
+    const [sales] = await Sales.aggregate(pipeline).toArray();
+
+    return { sales };
 }

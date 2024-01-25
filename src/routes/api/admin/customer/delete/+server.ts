@@ -1,4 +1,3 @@
-import { id } from '$lib/common/utils';
 import clientPromise from '$lib/server/mongo';
 
 /** @type {import('./$types').RequestHandler} */
@@ -7,24 +6,18 @@ export const POST = async ({ request, locals }: any) => {
     const db = await clientPromise();
     const Customer = db.collection('customers');
 
-    for (const key in data) {
-        if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
-        if (key === 'email') data[key] = data[key].toLowerCase();
-    }
+    data.isDeleted = true;
+    data.deletedAt = new Date();
+    data.isActive = false;
+    data.deletedBy = locals.user._id;
 
-    data._id = id();
-    data.fullName = `${data.firstName} ${data.lastName}`;
-    data.isActive = true;
-    data.createdAt = new Date();
-    data.createdBy = locals.user._id;
-    data.updatedBy = locals.user._id;
+    const response = await Customer.updateOne({ _id: data._id }, { $set: data });
 
-    const response = await Customer.insertOne(data);
     if (response) {
         return new Response(
             JSON.stringify({
                 success: true,
-                message: 'Customer added successfully',
+                message: 'Customer delete successfully',
                 data: response
             }),
             {
@@ -37,7 +30,7 @@ export const POST = async ({ request, locals }: any) => {
         return new Response(
             JSON.stringify({
                 success: false,
-                message: 'Failed to add customer',
+                message: 'Failed to delete customer',
                 data: response
             }),
             {

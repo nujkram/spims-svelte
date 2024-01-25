@@ -5,7 +5,7 @@ export const GET = async () => {
     const db = await clientPromise();
     const Customers = db.collection('customers');
 
-    const response = await Customers.find({}).sort({ createdAt: -1 }).toArray();
+    const response = await Customers.find({isActive: true}).sort({ createdAt: -1 }).toArray();
 
     if(response) {
         return new Response(
