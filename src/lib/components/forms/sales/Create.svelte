@@ -119,6 +119,7 @@
 		inputQuantity.setAttribute('id', `quantities[${newId}]`);
 		inputQuantity.setAttribute('type', 'number');
 		inputQuantity.setAttribute('name', 'quantities');
+		inputQuantity.setAttribute('step', '.01');
 		inputQuantity.setAttribute('value', '1');
 
 		const inputAmount = document.createElement('input');
@@ -126,6 +127,7 @@
 		inputAmount.setAttribute('id', `amounts[${newId}]`);
 		inputAmount.setAttribute('type', 'number');
 		inputAmount.setAttribute('name', 'amounts');
+		inputAmount.setAttribute('step', '.01');
 		inputAmount.setAttribute('value', selectedProduct[1].price);
 
 		sourceData[newId] = {
