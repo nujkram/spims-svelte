@@ -121,15 +121,23 @@
 		inputQuantity.setAttribute('name', 'quantities');
 		inputQuantity.setAttribute('value', '1');
 
+		const inputAmount = document.createElement('input');
+		inputAmount.setAttribute('class', 'input w-[80px] h-[30px]');
+		inputAmount.setAttribute('id', `amounts[${newId}]`);
+		inputAmount.setAttribute('type', 'number');
+		inputAmount.setAttribute('name', 'amounts');
+		inputAmount.setAttribute('value', selectedProduct[1].price);
+
 		sourceData[newId] = {
 			_id: selectedProduct[1].id,
 			name: selectedProduct[0],
-			price: formatCurrencyNoSymbol(stringToDecimal(selectedProduct[1].price)),
+			price: inputAmount.outerHTML,
 			quantity: inputQuantity.outerHTML,
 			subtotal: formatCurrencyNoSymbol(stringToDecimal(selectedProduct[1].price))
 		};
 		updateTable(sourceData);
 		quantityEventListener();
+		amountEventListener();
 	};
 
 	// product input chip event handler
@@ -148,11 +156,35 @@
 					const value = event.target.value;
 					const id = event.target.id;
 					const index = id.replace('quantities[', '').replace(']', '');
-					const price = stringToDecimal(sourceData[index].price);
+					const price = stringToDecimal(cart[index].price);
 					const subtotal = formatCurrencyNoSymbol(parseFloat(price) * parseFloat(value));
 					sourceData[index].subtotal = subtotal;
 
 					// set the subtotal to the cart
+					cart[index].quantity = value;
+					cart[index].subtotal = subtotal;
+
+					updateTable(sourceData);
+				});
+			});
+		}, 1000);
+	};
+
+	const amountEventListener = () => {
+		setTimeout(() => {
+			const inputAmounts = document.querySelectorAll('[name="amounts"]');
+			inputAmounts.forEach((input) => {
+				input.addEventListener('change', (event) => {
+					// get event target value
+					const value = event.target.value;
+					const id = event.target.id;
+					const index = id.replace('amounts[', '').replace(']', '');
+					console.log('sourceData[index]', cart[index])
+					const subtotal = formatCurrencyNoSymbol(parseFloat(value) * stringToDecimal(cart[index].quantity));
+					sourceData[index].subtotal = subtotal;
+
+					// set the subtotal to the cart
+					cart[index].price = value;
 					cart[index].subtotal = subtotal;
 
 					updateTable(sourceData);

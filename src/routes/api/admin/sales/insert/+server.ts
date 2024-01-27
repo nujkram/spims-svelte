@@ -59,32 +59,4 @@ export const POST = async ({ request, locals }: any) => {
             }
         )
     }
-    // const response = await Sales.insertOne(data);
-    // if (response) {
-    //     return new Response(
-    //         JSON.stringify({
-    //             success: true,
-    //             message: 'Customer added successfully',
-    //             data: response
-    //         }),
-    //         {
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             }
-    //         }
-    //     )
-    // } else {
-    //     return new Response(
-    //         JSON.stringify({
-    //             success: false,
-    //             message: 'Failed to add customer',
-    //             data: response
-    //         }),
-    //         {
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             }
-    //         }
-    //     )
-    // }
 }
