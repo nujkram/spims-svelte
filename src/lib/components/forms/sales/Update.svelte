@@ -238,7 +238,7 @@
 					customerId,
 					customer,
 					receipt: sales?.receipt,
-					downpayment: formatCurrencyNoSymbol(sales?.downpayment),
+					downpayment: sales?.downpayment,
 					paymentMethod: sales?.paymentMethod,
 					amount,
 					cart,

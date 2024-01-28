@@ -232,7 +232,7 @@
 					customerId,
 					customer,
 					receipt,
-					downpayment: formatCurrencyNoSymbol(downpayment),
+					downpayment,
 					paymentMethod,
 					amount,
 					cart,
