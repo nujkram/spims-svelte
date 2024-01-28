@@ -9,7 +9,9 @@
 	onMount(() => {
 		// sales order chart
 		const salesDate = salesSummary.map((s) => dateToString(s._id, 'MMM dd yyyy'));
-		const salesBalance = salesSummary.map((s) => s.totalBalance);
+		const salesIncome = salesSummary.map((s) => parseFloat(s.totalDownpayment) + parseFloat(s.totalPayments));
+        const salesAmount = salesSummary.map((s) => parseFloat(s.totalAmount));
+        const salesBalance = salesSummary.map((s) => parseFloat(s.totalBalance));
         // get sales amount from sales order with the same createdAt date
 		const salesCtx = document.getElementById('salesOrderChart');
 
@@ -25,9 +27,23 @@
 				datasets: [
 					{
 						label: 'Sales',
-						data: salesBalance,
+						data: salesAmount,
+						fill: false,
+						backgroundColor: 'rgb(204, 204, 204)',
+						tension: 0.1
+					},
+					{
+						label: 'Income',
+						data: salesIncome,
 						fill: false,
 						backgroundColor: 'rgb(75, 192, 192)',
+						tension: 0.1
+					},
+                    {
+						label: 'Balance',
+						data: salesBalance,
+						fill: false,
+						backgroundColor: 'rgb(212, 22, 60)',
 						tension: 0.1
 					}
 				]

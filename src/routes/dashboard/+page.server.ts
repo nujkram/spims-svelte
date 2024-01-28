@@ -93,7 +93,27 @@ export const load = async () => {
                 totalAmount: { $sum: "$amount" },
                 totalDownpayment: { $sum: "$downpayment" },
                 totalBalance: { $sum: { $subtract: ["$amount", "$downpayment"] } },
+                totalPayments: {
+                    $sum: {
+                        $cond: {
+                            if: { $isArray: "$payments" },
+                            then: {
+                                $sum: {
+                                    $map: {
+                                        input: "$payments",
+                                        as: "payment",
+                                        in: { $toDouble: "$$payment.amount" }
+                                    }
+                                }
+                            },
+                            else: 0
+                        }
+                    }
+                },
             }
+        },
+        {
+            $sort: { _id: 1 }
         }
     ]).toArray();
 
