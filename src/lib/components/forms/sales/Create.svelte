@@ -127,7 +127,6 @@
 		inputAmount.setAttribute('id', `amounts[${newId}]`);
 		inputAmount.setAttribute('type', 'number');
 		inputAmount.setAttribute('name', 'amounts');
-		inputAmount.setAttribute('step', '.01');
 		inputAmount.setAttribute('value', selectedProduct[1].price);
 
 		sourceData[newId] = {

@@ -44,7 +44,7 @@
 
 	// drawer settings
 	const drawerUpdate: DrawerSettings = {
-		id: 'updateCustomer',
+		id: 'updateSalesOrder',
 		// Provide your property overrides:
 		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
 		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
@@ -57,7 +57,7 @@
 	const drawerStore = getDrawerStore();
 	drawerStore.close();
 
-	// get full name initial from product.fullname
+	// get full name initial from customer.fullname
 	let fullNameInitial = sales?.customer?.fullName
 		.split(' ')
 		.map((name: string) => name[0])
@@ -208,7 +208,7 @@
 </div>
 
 <Drawer>
-	{#if $drawerStore.id === 'updateCustomer'}
+	{#if $drawerStore.id === 'updateSalesOrder'}
 		<Update
 			id={sales?._id}
 			moduleName={'sales'}
@@ -217,7 +217,6 @@
 			{drawerStore}
 			{customerData}
 			{productData}
-			{loadData}
 		/>
 	{/if}
 </Drawer>

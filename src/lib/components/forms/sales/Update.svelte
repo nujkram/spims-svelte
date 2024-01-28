@@ -16,7 +16,6 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 
-	export let loadData: () => void;
 	export let drawerStore = () => {};
 	export let moduleName: string;
 	export let sales: any;
@@ -123,6 +122,7 @@
 		inputQuantity.setAttribute('id', `quantities[${newId}]`);
 		inputQuantity.setAttribute('type', 'number');
 		inputQuantity.setAttribute('name', 'quantities');
+		inputQuantity.setAttribute('step', '.01');
 		inputQuantity.setAttribute('value', '1');
 
 		sourceData[newId] = {
@@ -176,6 +176,7 @@
 			inputQuantity.setAttribute('id', `quantities[${newId}]`);
 			inputQuantity.setAttribute('type', 'number');
 			inputQuantity.setAttribute('name', 'quantities');
+			inputQuantity.setAttribute('step', '.01');
 			inputQuantity.setAttribute('value', item?.quantity || '1');
 
 			sourceData[newId] = {
