@@ -106,7 +106,6 @@
 					item.company.includes(keyword.toUpperCase())
 				);
 			});
-
 			updateTable(filteredData);
 		} else {
 			updateTable(sourceData);
@@ -225,7 +224,7 @@
 				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
 				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
 				totalPayment: formatCurrencyNoSymbol(parseFloat(item.totalPayment)),
-				balance: formatCurrencyNoSymbol(item.balance),
+				balance: formatCurrencyNoSymbol(stringToDecimal(item.balance)),
 				createdAt: dateToString(item.createdAt)
 			};
 		});
