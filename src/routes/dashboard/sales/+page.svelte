@@ -78,8 +78,6 @@
 
 			salesData(sourceData);
 			if (sourceData) updateTable(sourceData);
-			console.log('sourceData', sourceData);
-
 		} catch (error) {
 			console.error(error);
 		}
@@ -231,9 +229,8 @@
 				}),
 				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
 				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
-				balance: formatCurrencyNoSymbol(
-					parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment))
-				),
+				totalPayment: formatCurrencyNoSymbol(parseFloat(item.totalPayment)),
+				balance: formatCurrencyNoSymbol(item.balance),
 				createdAt: dateToString(item.createdAt)
 			};
 		});

@@ -175,7 +175,7 @@
 			</div>
 		</div>
 		<h2 class="h2 border-t-2 pt-4 mt-6 w-full text-center">
-			{formatCurrency(stringToDecimal(sales?.amount) - stringToDecimal(sales?.downpayment)) || 0.0}
+			{formatCurrency(stringToDecimal(sales?.balance)) || 0.0}
 		</h2>
 		<p class="p text-xl">Balance</p>
 		<div class="flex flex-col md:flex-row w-full gap-4 justify-between mt-4">

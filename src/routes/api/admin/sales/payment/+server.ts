@@ -11,7 +11,6 @@ export const POST = async ({ request, locals }: any) => {
         if (key === '_id') continue;
         if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
     }
-    console.log('data', data)
 
     const salesUpdate = {
         $push: {

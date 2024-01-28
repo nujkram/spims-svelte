@@ -69,6 +69,7 @@ export const GET = async () => {
     sales.map((item) => {
         if (item.payments.length > 0) {
             item.totalPayment = item.payments.reduce((acc, curr) => parseFloat(acc) + parseFloat(curr.amount), 0);
+            item.balance = parseFloat(item.amount) - (parseFloat(item.downpayment) + parseFloat(item.totalPayment));
         }
 
     })
