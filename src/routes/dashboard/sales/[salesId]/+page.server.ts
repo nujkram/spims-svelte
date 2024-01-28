@@ -65,8 +65,12 @@ export async function load({ params }) {
     const [sales] = await Sales.aggregate(pipeline).toArray();
 
     // Add totalPayment to sales
-    sales.totalPayment = sales.payments.reduce((acc, curr) => parseFloat(acc) + parseFloat(curr.amount), 0);
-
+    if(sales.payments) {
+        sales.totalPayment = sales.payments.reduce((acc, curr) => parseFloat(acc) + parseFloat(curr.amount), 0);
+    } else {
+        sales.totalPayment = 0;
+    }
+    sales.balance = parseFloat(sales.amount) - (parseFloat(sales.downpayment) + parseFloat(sales.totalPayment));
 
     return { sales };
 }

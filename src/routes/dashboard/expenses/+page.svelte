@@ -27,14 +27,7 @@
 
 	let table: TableSource = {
 		// A list of heading labels.
-		head: [
-			'Date',
-			'Name',
-            'Invoice',
-            'Description',
-            'Items',
-            'Amount',
-		],
+		head: ['Date', 'Name', 'Invoice', 'Description', 'Items', 'Amount'],
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, [
 			'createdAt',
@@ -42,7 +35,7 @@
 			'invoice',
 			'description',
 			'items',
-			'amount',
+			'amount'
 		])
 	};
 
@@ -124,7 +117,7 @@
 			'invoice',
 			'description',
 			'items',
-			'totalAmount',
+			'totalAmount'
 		]);
 		table.meta = tableMapperValues(paginatedData, [
 			'createdAt',
@@ -132,7 +125,7 @@
 			'invoice',
 			'description',
 			'items',
-			'totalAmount',
+			'totalAmount'
 		]);
 		table.foot = [
 			'Total',
@@ -176,7 +169,7 @@
 		totalExpenses = 0;
 		return data.map((item: any) => {
 			totalExpenses += parseFloat(stringToDecimal(item.totalAmount));
-			console.log('item', item)
+
 			return {
 				...item,
 				items: item.cart.map((cart: any) => {

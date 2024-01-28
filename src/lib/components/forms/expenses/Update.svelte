@@ -8,10 +8,7 @@
 		tableMapperValues
 	} from '@skeletonlabs/skeleton';
 	import type { AutocompleteOption, TableSource, ToastSettings } from '@skeletonlabs/skeleton';
-	import {
-		formatCurrency,
-		stringToDecimal
-	} from '$lib/utils/currencyHelper';
+	import { formatCurrency, stringToDecimal } from '$lib/utils/currencyHelper';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 
@@ -68,7 +65,7 @@
 	};
 	const uniqueNames = new Set(sourceData.map((data: any) => data.name));
 
-    nameOptions = [...uniqueNames].map((name: any) => {
+	nameOptions = [...uniqueNames].map((name: any) => {
 		return {
 			label: name,
 			value: name,
@@ -76,8 +73,6 @@
 			keywords: name
 		};
 	});
-    console.log(nameOptions)
-
 
 	// autocomplete name selection event handler function to update name value on selection
 	const onNameSelection = (event: CustomEvent<AutocompleteOption<string>>): void => {
@@ -242,7 +237,7 @@
 
 	const loadCart = async () => {
 		await cart.forEach((item: any) => {
-            totalAmount += parseFloat(stringToDecimal(item.amount));
+			totalAmount += parseFloat(stringToDecimal(item.amount));
 			// update cart table
 			let maxId = Math.max(...Object.keys(cartData).map((key) => parseInt(key)));
 			let newId = Number.isFinite(maxId) ? maxId + 1 : 0;
@@ -262,14 +257,14 @@
 			selectPaymentMethod.setAttribute('name', 'paymentMethods');
 			const paymentMethodOptions = ['Cash', 'Bank Transfer', 'GCash', 'Payable', 'Cheque'];
 
-            paymentMethodOptions.forEach((optionValue) => {
+			paymentMethodOptions.forEach((optionValue) => {
 				const option = document.createElement('option');
 				option.value = optionValue;
 				option.text = optionValue;
 
 				// set selected attribute if it matches item.paymentMethod
 				if (optionValue === item.paymentMethod) {
-                    option.setAttribute('selected', 'selected');
+					option.setAttribute('selected', 'selected');
 				}
 
 				selectPaymentMethod.appendChild(option);
@@ -343,7 +338,7 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-                    _id: id,
+					_id: id,
 					invoice,
 					name,
 					description,
