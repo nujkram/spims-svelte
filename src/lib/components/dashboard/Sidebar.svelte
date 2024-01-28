@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AppRail, AppRailTile } from '@skeletonlabs/skeleton';
-	import { Box, Cart, FileBarGraph, Home, People, Tag } from '$lib/components/icons/index';
+	import { Box, Cart, FileBarGraph, Home, People, Tag, Wallet } from '$lib/components/icons/index';
 	import { goto } from '$app/navigation';
 
 	let currentTile: number = 0;
@@ -9,10 +9,11 @@
 		0: '/dashboard',
 		1: '/dashboard/sales',
 		2: '/dashboard/purchase',
-		3: '/dashboard/products',
-		4: '/dashboard/customers',
-		5: '/dashboard/users',
-		6: '/dashboard/reports'
+		3: '/dashboard/expenses',
+		4: '/dashboard/products',
+		5: '/dashboard/customers',
+		6: '/dashboard/users',
+		7: '/dashboard/reports'
 	};
 
 	const handleTileClick = (i: number) => {
@@ -51,7 +52,7 @@
 		</svelte:fragment>
 		<span>Sales Order</span>
 	</AppRailTile>
-	<AppRailTile
+	<!-- <AppRailTile
 		bind:group={currentTile}
 		name="Purchase Order"
 		value={2}
@@ -64,11 +65,25 @@
 			</div>
 		</svelte:fragment>
 		<span>Purchase Order</span>
+	</AppRailTile> -->
+	<AppRailTile
+		bind:group={currentTile}
+		name="Expenses"
+		value={3}
+		title="Expenses"
+		on:click={() => currentTile + 1}
+	>
+		<svelte:fragment slot="lead">
+			<div class="flex items-center justify-center">
+				<Wallet />
+			</div>
+		</svelte:fragment>
+		<span>Expenses</span>
 	</AppRailTile>
 	<AppRailTile
 		bind:group={currentTile}
 		name="Products"
-		value={3}
+		value={4}
 		title="Products"
 		on:click={() => currentTile + 1}
 	>
@@ -82,7 +97,7 @@
 	<AppRailTile
 		bind:group={currentTile}
 		name="Customers"
-		value={4}
+		value={5}
 		title="Customers"
 		on:click={() => currentTile + 1}
 	>
@@ -96,7 +111,7 @@
 	<AppRailTile
 		bind:group={currentTile}
 		name="Users"
-		value={5}
+		value={6}
 		title="Users"
 		on:click={() => currentTile + 1}
 	>
@@ -110,7 +125,7 @@
 	<AppRailTile
 		bind:group={currentTile}
 		name="Reports"
-		value={6}
+		value={7}
 		title="Reports"
 		on:click={() => currentTile + 1}
 	>

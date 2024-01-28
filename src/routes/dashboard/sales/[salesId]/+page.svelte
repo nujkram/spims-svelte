@@ -9,8 +9,12 @@
 	} from '@skeletonlabs/skeleton';
 	import type { DrawerSettings, TableSource, ToastSettings } from '@skeletonlabs/skeleton';
 	import Update from '$lib/components/forms/sales/Update.svelte';
+	import Payment from '$lib/components/forms/sales/Payment.svelte';
 	import dateToString from '$lib/utils/dateHelper';
-	import { formatCurrency, stringToDecimal } from '$lib/utils/currencyHelper.js';
+	import {
+		formatCurrency,
+		stringToDecimal
+	} from '$lib/utils/currencyHelper.js';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	export let data;
@@ -20,10 +24,16 @@
 	let customerData: any = [];
 	let productData: any = [];
 	let cartData: any = [];
-	let table: TableSource = {
+	let tableProducts: TableSource = {
 		head: ['Name', 'Price', 'Quantity', 'Total'],
 		body: tableMapperValues(sales?.cart, ['name', 'price', 'quantity', 'subtotal']),
-		foot: ['Total', '', '', formatCurrency(sales?.amount)]
+		foot: ['Total', '', '', formatCurrency(sales?.amount || 0)]
+	};
+
+	let tablePayments: TableSource = {
+		head: ['Transaction Date', 'MOD', 'Amount'],
+		body: tableMapperValues(sales?.payments, ['createdAt', 'paymentMethod', 'amount']),
+		foot: ['Total', formatCurrency(sales?.totalPayment || 0)]
 	};
 
 	const toastStore = getToastStore();
@@ -44,7 +54,7 @@
 
 	// drawer settings
 	const drawerUpdate: DrawerSettings = {
-		id: 'updateCustomer',
+		id: 'updateSalesOrder',
 		// Provide your property overrides:
 		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
 		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
@@ -54,10 +64,21 @@
 		position: 'right'
 	};
 
+	const drawerPayment: DrawerSettings = {
+		id: 'paymentSalesOrder',
+		// Provide your property overrides:
+		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
+		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
+		width: 'w-[280px] md:w-[480px]',
+		padding: 'p-4',
+		rounded: 'rounded-xl',
+		position: 'right'
+	};
+
 	const drawerStore = getDrawerStore();
 	drawerStore.close();
 
-	// get full name initial from product.fullname
+	// get full name initial from customer.fullname
 	let fullNameInitial = sales?.customer?.fullName
 		.split(' ')
 		.map((name: string) => name[0])
@@ -97,14 +118,13 @@
 			toastSettings.message = result.message;
 			toastStore.trigger(toastSettings);
 			goto('/dashboard/sales');
-		}
-		catch (error) {
+		} catch (error) {
 			toastSettings.message = error.message;
 			toastSettings.background = 'bg-red-500';
 			toastStore.trigger(toastSettings);
 			console.error(error);
 		}
-	}
+	};
 
 	onMount(async () => {
 		await loadData();
@@ -194,12 +214,18 @@
 				<p class="p">{sales?.updatedBy.fullName || 'NA'}</p>
 			</div>
 		</div>
-		<div class="flex w-full mt-6">
-			<Table source={table} />
+		<div class="flex flex-col w-full mt-6">
+			<h2 class="h2 pt-4 my-4 w-full">Cart</h2>
+			<Table source={tableProducts} />
+		</div>
+		<div class="flex flex-col w-full mt-6">
+			<h2 class="h2 pt-4 my-4 w-full">Payment Transactions</h2>
+			<Table source={tablePayments} />
 		</div>
 	</section>
 	<footer class="card-footer flex justify-end border-t-2 p-4">
 		<div class="btn-group variant-filled overflow-auto">
+			<button type="button" on:click={() => drawerStore.open(drawerPayment)}>Add Payment</button>
 			<button type="button" on:click={() => drawerStore.open(drawerUpdate)}>Edit</button>
 			<button type="button" on:click={() => toastStore.trigger(confirmSettings)}>Delete</button>
 			<button type="button" on:click={() => window.history.back()}>Close</button>
@@ -208,7 +234,7 @@
 </div>
 
 <Drawer>
-	{#if $drawerStore.id === 'updateCustomer'}
+	{#if $drawerStore.id === 'updateSalesOrder'}
 		<Update
 			id={sales?._id}
 			moduleName={'sales'}
@@ -217,7 +243,8 @@
 			{drawerStore}
 			{customerData}
 			{productData}
-			{loadData}
 		/>
+	{:else if $drawerStore.id === 'paymentSalesOrder'}
+		<Payment id={sales?._id} {drawerStore} />
 	{/if}
 </Drawer>

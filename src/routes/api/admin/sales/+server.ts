@@ -65,6 +65,14 @@ export const GET = async () => {
 
     const sales = await Sales.aggregate(pipeline).toArray();
 
+    // Add totalPayment to sales
+    sales.map((item) => {
+        if (item.payments.length > 0) {
+            item.totalPayment = item.payments.reduce((acc, curr) => parseFloat(acc) + parseFloat(curr.amount), 0);
+        }
+
+    })
+
     if (sales) {
         return new Response(
             JSON.stringify({

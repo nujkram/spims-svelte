@@ -8,7 +8,7 @@
 		tableMapperValues
 	} from '@skeletonlabs/skeleton';
 	import type { DrawerSettings, PaginationSettings, TableSource } from '@skeletonlabs/skeleton';
-	import Create from '$lib/components/forms/sales/Create.svelte';
+	import Create from '$lib/components/forms/expenses/Create.svelte';
 	import { goto } from '$app/navigation';
 	import {
 		formatCurrency,
@@ -22,49 +22,33 @@
 	let endDate: string = '';
 
 	let sourceData: any = [];
-	let customerData: any = [];
-	let productData: any = [];
-	let totalSales: number = 0;
-	let totalDownpayment: number = 0;
-	let totalPayment: number = 0;
-	let totalBalance: number = 0;
+	let cartData: any = [];
+	let totalExpenses: number = 0;
 
 	let table: TableSource = {
 		// A list of heading labels.
 		head: [
 			'Date',
-			'Business',
-			'Customer',
-			'Company',
-			'Addess',
-			'Description',
-			'OR No',
-			'Amount',
-			'DP',
-			'Payment',
-			'Balance',
-			'MOD'
+			'Name',
+            'Invoice',
+            'Description',
+            'Items',
+            'Amount',
 		],
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, [
 			'createdAt',
-			'business',
-			'customer',
-			'company',
-			'address',
+			'name',
+			'invoice',
 			'description',
-			'receipt',
+			'items',
 			'amount',
-			'downpayment',
-			'totalPayment',
-			'balance',
-			'paymentMethod'
 		])
 	};
 
 	async function loadData() {
 		try {
-			let response = await fetch('/api/admin/sales', {
+			let response = await fetch('/api/admin/expenses', {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json'
@@ -72,21 +56,21 @@
 			});
 
 			let result = await response.json();
-			sourceData = result.response.sales;
-			customerData = result.response.customers;
-			productData = result.response.products;
-
-			salesData(sourceData);
+			sourceData = result.response;
+			expensesData(sourceData);
 			if (sourceData) updateTable(sourceData);
-			console.log('sourceData', sourceData);
-
+			// get all cart data
+			cartData = sourceData.map((item: any) => {
+				// return item.cart objects inside the array
+				return Object.values(item.cart);
+			});
 		} catch (error) {
 			console.error(error);
 		}
 	}
 
 	const drawerCreate: DrawerSettings = {
-		id: 'createSalesOrder',
+		id: 'createExpenses',
 		// Provide your property overrides:
 		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
 		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
@@ -101,7 +85,7 @@
 
 	const filterTable = (keyword: string) => {
 		paginationSettings.page = 0;
-		let tempData = salesData(sourceData);
+		let tempData = expensesData(sourceData);
 		if (keyword.length > 0) {
 			let filteredData = tempData.filter((item: any) => {
 				return (
@@ -120,7 +104,7 @@
 	// filter sourceData createdAt by date between start and end
 	const filterByDate = (start: Date, end: Date) => {
 		paginationSettings.page = 0;
-		let tempData = salesData(sourceData);
+		let tempData = expensesData(sourceData);
 		let filteredData = tempData.filter((item: any) => {
 			return new Date(item.createdAt) >= start && new Date(item.createdAt) <= end;
 		});
@@ -128,7 +112,7 @@
 	};
 
 	const updateTable = (sourceData: any) => {
-		sourceData = salesData(sourceData);
+		sourceData = expensesData(sourceData);
 		paginationSettings.size = sourceData.length;
 		let paginatedData = sourceData.slice(
 			paginationSettings.page * paginationSettings.limit,
@@ -136,45 +120,27 @@
 		);
 		table.body = tableMapperValues(paginatedData, [
 			'createdAt',
-			'business',
-			'customer',
-			'company',
-			'address',
+			'name',
+			'invoice',
 			'description',
-			'receipt',
-			'amount',
-			'downpayment',
-			'totalPayment',
-			'balance',
-			'paymentMethod'
+			'items',
+			'totalAmount',
 		]);
 		table.meta = tableMapperValues(paginatedData, [
 			'createdAt',
-			'business',
 			'_id',
-			'company',
-			'address',
+			'invoice',
 			'description',
-			'receipt',
-			'amount',
-			'downpayment',
-			'totalPayment',
-			'balance',
-			'paymentMethod'
+			'items',
+			'totalAmount',
 		]);
 		table.foot = [
 			'Total',
 			'',
 			'',
 			'',
-			'',
-			'',
-			'',
-			`<div class="variant-filled-secondary px-2 rounded">${formatCurrency(totalSales)}</div>`,
-			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalDownpayment)}</div>`,
-			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalPayment)}</div>`,
-			`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalBalance)}</div>`,
-			`<code class="code">${sourceData.length}</code>`
+			`<code class="code">${sourceData.length}</code>`,
+			`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalExpenses)}</div>`
 		];
 	};
 
@@ -203,37 +169,20 @@
 
 	// table row select handler
 	function tableSelectHandler(e: CustomEvent): void {
-		goto(`/dashboard/sales/${e.detail[2]}`);
+		goto(`/dashboard/expenses/${e.detail[1]}`);
 	}
 
-	const salesData = (data: any) => {
-		totalSales = 0;
-		totalDownpayment = 0;
-		totalPayment = 0;
-		totalBalance = 0;
+	const expensesData = (data: any) => {
+		totalExpenses = 0;
 		return data.map((item: any) => {
-			totalSales += parseFloat(stringToDecimal(item.amount));
-			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
-			totalPayment += parseFloat(stringToDecimal(item.totalPayment));
-			totalBalance +=
-				parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment));
-
+			totalExpenses += parseFloat(stringToDecimal(item.totalAmount));
+			console.log('item', item)
 			return {
 				...item,
-				customer:
-					customerData.find((customer: any) => customer._id === item.customerId).fullName || '',
-				address:
-					customerData.find((customer: any) => customer._id === item.customerId).address || '',
-				company:
-					customerData.find((customer: any) => customer._id === item.customerId).company || '',
-				description: item.cart.map((cart: any) => {
-					return ` [${cart.name}, ${cart.price} x ${cart.quantity} = ${cart.subtotal || 0.0}]`;
+				items: item.cart.map((cart: any) => {
+					return ` [${cart.name}, ${formatCurrency(cart.amount)}, ${cart.paymentMethod}]`;
 				}),
-				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
-				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
-				balance: formatCurrencyNoSymbol(
-					parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment))
-				),
+				totalAmount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.totalAmount))),
 				createdAt: dateToString(item.createdAt)
 			};
 		});
@@ -245,18 +194,18 @@
 
 <div class="card mb-4">
 	<header class="card-header">
-		<h1 class="h3">Sales Order</h1>
+		<h1 class="h3">Expenses</h1>
 	</header>
 	<section class="flex p-4 w-full gap-4">
 		<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
-			>Add <br />Sales Order</button
+			>Add <br />Expenses</button
 		>
 		<label class="label flex-auto">
 			<span>Search</span>
 			<input
 				class="input"
 				type="text"
-				placeholder="Search by customer, company, or address"
+				placeholder="Search"
 				name="keyword"
 				bind:value={keyword}
 				on:input={() => filterTable(keyword)}
@@ -300,7 +249,7 @@
 	/>
 {/key}
 <Drawer>
-	{#if $drawerStore.id === 'createSalesOrder'}
-		<Create {drawerStore} {loadData} {customerData} {productData} />
+	{#if $drawerStore.id === 'createExpenses'}
+		<Create {drawerStore} {loadData} {sourceData} />
 	{/if}
 </Drawer>

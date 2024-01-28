@@ -31,6 +31,7 @@
 	let cart: string[] = [];
 	let sourceData: any = [];
 	let business: string = 'RAC';
+
 	const toastStore = getToastStore();
 	const toastSettings: ToastSettings = {
 		message: '',
@@ -127,7 +128,6 @@
 		inputAmount.setAttribute('id', `amounts[${newId}]`);
 		inputAmount.setAttribute('type', 'number');
 		inputAmount.setAttribute('name', 'amounts');
-		inputAmount.setAttribute('step', '.01');
 		inputAmount.setAttribute('value', selectedProduct[1].price);
 
 		sourceData[newId] = {
@@ -314,8 +314,10 @@
 				<span>Payment Method</span>
 				<select class="select" bind:value={paymentMethod}>
 					<option value="Cash">Cash</option>
-					<option value="Online Payment">Online Payment</option>
-					<option value="Bank Transaction">Bank Transaction</option>
+					<option value="Bank Transfer">Bank Transfer</option>
+					<option value="GCash">GCash</option>
+					<option value="Payable">Payable</option>
+					<option value="Cheque">Cheque</option>
 				</select>
 			</label>
 		</div>

@@ -5,23 +5,11 @@ import clientPromise from '$lib/server/mongo';
 export const POST = async ({ request, locals }: any) => {
     const data = await request.json();
     const db = await clientPromise();
-    const Customers = db.collection('customers');
-    const Sales = db.collection('sales');
+    const Expenses = db.collection('expenses');
 
-    data.customer = data.customer ? data.customer.toUpperCase() : '';
-
-    // if no customer found create one
-    if (!data?.customerId) {
-        const newCustomer = {
-            _id: id(),
-            createdAt: new Date(),
-            createdBy: locals.user._id,
-            updatedBy: locals.user._id,
-            isActive: true,
-            fullName: data.customer
-        }
-        await Customers.insertOne(newCustomer);
-        data.customerId = newCustomer._id;
+    for (const key in data) {
+        if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
+        if (key === 'email') data[key] = data[key].toLowerCase();
     }
 
     data._id = id();
@@ -32,7 +20,7 @@ export const POST = async ({ request, locals }: any) => {
     data.updatedBy = locals.user._id;
 
     if (data) {
-        const response = await Sales.insertOne(data);
+        const response = await Expenses.insertOne(data);
         return new Response(
             JSON.stringify({
                 success: true,
