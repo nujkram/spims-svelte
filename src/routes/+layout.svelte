@@ -92,7 +92,7 @@
 				</a>
 				<LightSwitch />
 				{#if $page.data.user}
-					<button class="btn variant-filled w-24" use:popup={popupClick}>Profile</button>
+					<button class="btn variant-filled w-24" use:popup={popupClick}>Hi, {$page.data.user.firstName}</button>
 					<div class="card p-4 bg-gray-900" data-popup="popupClick">
 						<button
 							type="button"

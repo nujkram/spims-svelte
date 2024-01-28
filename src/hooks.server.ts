@@ -16,9 +16,11 @@ export const handle =async ({event, resolve}:{event: any; resolve: any}) => {
     if (user) {
         event.locals.user = {
             _id: user._id,
-            name: user?.profile?.displayName || user?.emails?.[0]?.address,
+            name: user?.fullName || user?.emails?.[0]?.address,
             email: user?.emails?.[0]?.address,
-            profile: user?.profile,
+            firstName: user?.firstName,
+            lastName: user?.lastName,
+            role: user?.role,
         };
     } else {
         event.locals.user = null;
