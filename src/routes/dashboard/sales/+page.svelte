@@ -208,7 +208,7 @@
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
 			totalPayment += parseFloat(stringToDecimal(item.totalPayment));
 			totalBalance +=
-				parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment));
+				parseFloat(stringToDecimal(item.amount)) - (parseFloat(stringToDecimal(item.downpayment)) + parseFloat(stringToDecimal(item.totalPayment)));
 
 			return {
 				...item,
