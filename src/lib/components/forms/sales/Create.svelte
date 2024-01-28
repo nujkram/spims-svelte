@@ -181,7 +181,6 @@
 					const value = event.target.value;
 					const id = event.target.id;
 					const index = id.replace('amounts[', '').replace(']', '');
-					console.log('sourceData[index]', cart[index])
 					const subtotal = formatCurrencyNoSymbol(parseFloat(value) * stringToDecimal(cart[index].quantity));
 					sourceData[index].subtotal = subtotal;
 
