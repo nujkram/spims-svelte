@@ -1,5 +1,6 @@
 import { id } from '$lib/common/utils';
 import clientPromise from '$lib/server/mongo';
+import { stringToDecimal } from '$lib/utils/currencyHelper';
 
 /** @type {import('./$types').RequestHandler} */
 export const POST = async ({ request, locals }: any) => {
@@ -15,7 +16,7 @@ export const POST = async ({ request, locals }: any) => {
     const salesUpdate = {
         $push: {
             payments: {
-              amount: data.amount,
+              amount: stringToDecimal(data.amount),
               paymentMethod: data.paymentMethod,  
               createdBy: locals.user._id,
               createdAt: new Date()
