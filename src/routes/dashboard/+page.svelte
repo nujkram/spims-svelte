@@ -5,17 +5,17 @@
 	import dateToString from '$lib/utils/dateHelper';
 	export let data;
 
-	let { customers, sales, expenses, users } = data;
-
+	let { customers, users, salesSummary, expensesSummary } = data;
 	onMount(() => {
 		// sales order chart
-		const salesDate = sales.map((s) => dateToString(s.createdAt, 'MMM dd yyyy'));
-		const salesAmount = sales.map((s) => s.amount);
+		const salesDate = salesSummary.map((s) => dateToString(s._id, 'MMM dd yyyy'));
+		const salesBalance = salesSummary.map((s) => s.totalBalance);
+        // get sales amount from sales order with the same createdAt date
 		const salesCtx = document.getElementById('salesOrderChart');
 
 		// expenses chart
-		const expensesDate = expenses.map((s) => dateToString(s.createdAt, 'MMM dd yyyy'));
-		const expensesAmount = expenses.map((s) => s.totalAmount);
+		const expensesDate = expensesSummary.map((s) => dateToString(s._id, 'MMM dd yyyy'));
+		const expensesAmount = expensesSummary.map((s) => s.totalExpenses);
 		const expensesCtx = document.getElementById('expensesChart');
 
 		new Chart(salesCtx, {
@@ -25,7 +25,7 @@
 				datasets: [
 					{
 						label: 'Sales',
-						data: salesAmount,
+						data: salesBalance,
 						fill: false,
 						backgroundColor: 'rgb(75, 192, 192)',
 						tension: 0.1

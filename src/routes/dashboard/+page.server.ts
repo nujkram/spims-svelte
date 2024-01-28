@@ -81,11 +81,43 @@ export const load = async () => {
 
     })
 
+    const salesSummary = await Sales.aggregate([
+        {
+            $match: {
+                isActive: true,
+            }
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                totalAmount: { $sum: "$amount" },
+                totalDownpayment: { $sum: "$downpayment" },
+                totalBalance: { $sum: { $subtract: ["$amount", "$downpayment"] } },
+            }
+        }
+    ]).toArray();
+
+    const expensesSummary = await Expenses.aggregate([
+        {
+            $match: {
+                isActive: true,
+            }
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                totalExpenses: { $sum: "$totalAmount" },
+            }
+        }
+    ]).toArray();
+
     return {
         sales,
         customers,
         expenses,
         products,
-        users
+        users,
+        salesSummary,
+        expensesSummary
     }
 }
