@@ -32,7 +32,7 @@
 
 	let tablePayments: TableSource = {
 		head: ['Transaction Date', 'MOD', 'Amount'],
-		body: tableMapperValues(sales?.payments, ['createdAt', 'paymentMethod', 'amount']),
+		body: tableMapperValues(sales?.payments || [], ['createdAt', 'paymentMethod', 'amount']),
 		foot: ['Total', formatCurrency(sales?.totalPayment || 0)]
 	};
 
