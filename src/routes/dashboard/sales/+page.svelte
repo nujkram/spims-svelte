@@ -26,6 +26,7 @@
 	let productData: any = [];
 	let totalSales: number = 0;
 	let totalDownpayment: number = 0;
+	let totalPayment: number = 0;
 	let totalBalance: number = 0;
 
 	let table: TableSource = {
@@ -40,6 +41,7 @@
 			'OR No',
 			'Amount',
 			'DP',
+			'Payment',
 			'Balance',
 			'MOD'
 		],
@@ -54,6 +56,7 @@
 			'receipt',
 			'amount',
 			'downpayment',
+			'totalPayment',
 			'balance',
 			'paymentMethod'
 		])
@@ -75,6 +78,8 @@
 
 			salesData(sourceData);
 			if (sourceData) updateTable(sourceData);
+			console.log('sourceData', sourceData);
+
 		} catch (error) {
 			console.error(error);
 		}
@@ -139,6 +144,7 @@
 			'receipt',
 			'amount',
 			'downpayment',
+			'totalPayment',
 			'balance',
 			'paymentMethod'
 		]);
@@ -152,6 +158,7 @@
 			'receipt',
 			'amount',
 			'downpayment',
+			'totalPayment',
 			'balance',
 			'paymentMethod'
 		]);
@@ -165,6 +172,7 @@
 			'',
 			`<div class="variant-filled-secondary px-2 rounded">${formatCurrency(totalSales)}</div>`,
 			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalDownpayment)}</div>`,
+			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalPayment)}</div>`,
 			`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalBalance)}</div>`,
 			`<code class="code">${sourceData.length}</code>`
 		];
@@ -201,10 +209,12 @@
 	const salesData = (data: any) => {
 		totalSales = 0;
 		totalDownpayment = 0;
+		totalPayment = 0;
 		totalBalance = 0;
 		return data.map((item: any) => {
 			totalSales += parseFloat(stringToDecimal(item.amount));
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
+			totalPayment += parseFloat(stringToDecimal(item.totalPayment));
 			totalBalance +=
 				parseFloat(stringToDecimal(item.amount)) - parseFloat(stringToDecimal(item.downpayment));
 
