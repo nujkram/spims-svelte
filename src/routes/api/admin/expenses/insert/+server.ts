@@ -13,6 +13,7 @@ export const POST = async ({ request, locals }: any) => {
     }
 
     data._id = id();
+    data.amount = data.amount ? parseFloat(data.amount) : 0;
     data.isActive = true;
     data.createdAt = new Date();
     data.updatedAt = new Date();
