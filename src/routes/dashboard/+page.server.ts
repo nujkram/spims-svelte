@@ -92,7 +92,6 @@ export const load = async () => {
                 _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
                 totalAmount: { $sum: "$amount" },
                 totalDownpayment: { $sum: "$downpayment" },
-                totalBalance: { $sum: { $subtract: ["$amount", "$downpayment"] } },
                 totalPayments: {
                     $sum: {
                         $cond: {
@@ -112,6 +111,21 @@ export const load = async () => {
                 },
             }
         },
+        {
+            $addFields: {
+                totalBalance: {
+                    $subtract: [
+                        "$totalAmount",
+                        {
+                            $add: [
+                                "$totalDownpayment",
+                                "$totalPayments"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },            
         {
             $sort: { _id: 1 }
         }

@@ -157,7 +157,7 @@
 		]);
 		table.foot = [
 			'Total',
-			'',
+			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalDownpayment + totalPayment)}</div>`,
 			'',
 			'',
 			'',
