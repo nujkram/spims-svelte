@@ -119,6 +119,10 @@
 				<h3 class="h3">Invoice No</h3>
 				<p class="p">{expenses?.invoice || 'NA'}</p>
 			</div>
+            <div class="flex flex-col items-center">
+				<h3 class="h3">Business</h3>
+				<p class="p">{expenses?.business || 'NA'}</p>
+			</div>
 			<div class="flex flex-col items-center">
 				<h3 class="h3">Created At</h3>
 				<p class="p">{expenses?.createdAt ? dateToString(expenses?.createdAt) : 'NA'}</p>

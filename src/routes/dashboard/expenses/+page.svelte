@@ -27,11 +27,12 @@
 
 	let table: TableSource = {
 		// A list of heading labels.
-		head: ['Date', 'Name', 'Invoice', 'Description', 'Items', 'Amount'],
+		head: ['Date', 'Name', 'Business', 'Invoice', 'Description', 'Items', 'Amount'],
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, [
 			'createdAt',
 			'name',
+			'business',
 			'invoice',
 			'description',
 			'items',
@@ -114,6 +115,7 @@
 		table.body = tableMapperValues(paginatedData, [
 			'createdAt',
 			'name',
+			'business',
 			'invoice',
 			'description',
 			'items',
@@ -123,6 +125,7 @@
 			'createdAt',
 			'_id',
 			'invoice',
+			'business',
 			'description',
 			'items',
 			'totalAmount'

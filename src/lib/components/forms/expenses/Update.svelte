@@ -19,6 +19,7 @@
 	export let sourceData: string[];
 	let isFocused: boolean = true;
 	let invoice: string = expenses?.invoice;
+	let business: string = expenses?.business;
 	let description: string = expenses?.description;
 	let name: string = expenses?.name;
 	let nameOptions: any;
@@ -340,6 +341,7 @@
 				body: JSON.stringify({
 					_id: id,
 					invoice,
+					business,
 					name,
 					description,
 					totalAmount,
@@ -374,6 +376,13 @@
 					bind:value={invoice}
 					required
 				/>
+			</label>
+			<label class="label">
+				<span>Business</span>
+				<select class="select" bind:value={business}>
+					<option value="RAC">RAC</option>
+					<option value="DTF">DTF</option>
+				</select>
 			</label>
 			<label class="label">
 				<span>Description</span>
