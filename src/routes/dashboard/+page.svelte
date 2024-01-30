@@ -90,7 +90,7 @@
 </div>
 
 <div class="grid grid-cols-2 w-full gap-4">
-	<div class="card mb-4">
+	<div class="card mb-4 col-span-2 md:col-span-1">
 		<header class="flex card-header gap-2 items-center">
             <Cart />
 			<h1 class="h3">Sales Order</h1>
@@ -99,7 +99,7 @@
 			<canvas id="salesOrderChart"></canvas>
 		</section>
 	</div>
-	<div class="card mb-4">
+	<div class="card mb-4 col-span-2 md:col-span-1">
 		<header class="flex card-header gap-2 items-center">
             <Wallet />
 			<h1 class="h3">Expenses</h1>
