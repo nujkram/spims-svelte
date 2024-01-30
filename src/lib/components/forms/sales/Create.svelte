@@ -257,7 +257,6 @@
 	<div class="grid md:grid-cols-4 grid-cols-1">
 		<div class="col-span-1 p-6 flex flex-col gap-4">
 			<h2 class="h4">Create Sales Order</h2>
-			<!-- dropdown business -->
 			<label class="label">
 				<span>Business</span>
 				<select class="select" bind:value={business}>

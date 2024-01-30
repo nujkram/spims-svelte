@@ -21,6 +21,7 @@
 	let isFocused: boolean = true;
 	let invoice: string = '';
 	let description: string = '';
+	let business: string = '';
 	let name: string = '';
 	let nameOptions: any;
 	let item: string = '';
@@ -285,6 +286,7 @@
 				},
 				body: JSON.stringify({
                     invoice,
+					business,
 					name,
 					description,
 					totalAmount,
@@ -319,6 +321,13 @@
 					bind:value={invoice}
 					required
 				/>
+			</label>
+			<label class="label">
+				<span>Business</span>
+				<select class="select" bind:value={business}>
+					<option value="RAC">RAC</option>
+					<option value="DTF">DTF</option>
+				</select>
 			</label>
 			<label class="label">
 				<span>Description</span>
