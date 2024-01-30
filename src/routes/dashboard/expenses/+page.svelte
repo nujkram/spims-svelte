@@ -135,6 +135,7 @@
 			'',
 			'',
 			'',
+			'',
 			`<code class="code">${sourceData.length}</code>`,
 			`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalExpenses)}</div>`
 		];
