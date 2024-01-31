@@ -206,9 +206,9 @@
 		return data.map((item: any) => {
 			totalSales += parseFloat(stringToDecimal(item.amount));
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
-			totalPayment += parseFloat(stringToDecimal(item.totalPayment));
+			totalPayment += parseFloat(stringToDecimal(item?.totalPayment || 0));
 			totalBalance +=
-				parseFloat(stringToDecimal(item.amount)) - (parseFloat(stringToDecimal(item.downpayment)) + parseFloat(stringToDecimal(item.totalPayment)));
+				parseFloat(stringToDecimal(item.amount)) - (parseFloat(stringToDecimal(item.downpayment)) + parseFloat(stringToDecimal(item.totalPayment || 0)));
 
 			return {
 				...item,
