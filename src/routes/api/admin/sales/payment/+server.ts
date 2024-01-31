@@ -16,7 +16,7 @@ export const POST = async ({ request, locals }: any) => {
     const salesUpdate = {
         $push: {
             payments: {
-              amount: stringToDecimal(data.amount),
+              amount: stringToDecimal(data?.amount || 0),
               paymentMethod: data.paymentMethod,  
               createdBy: locals.user._id,
               createdAt: new Date()

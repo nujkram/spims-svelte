@@ -1,49 +1,28 @@
 <script lang="ts">
-	import { AppRail, AppRailTile } from '@skeletonlabs/skeleton';
+	import { page } from '$app/stores';
+	import { AppRail, AppRailAnchor } from '@skeletonlabs/skeleton';
 	import { Box, Cart, FileBarGraph, Home, People, Tag, Wallet } from '$lib/components/icons/index';
-	import { goto } from '$app/navigation';
 
-	let currentTile: number = 0;
+	let showSubmenu = false;
 
-	const urls: any = {
-		0: '/dashboard',
-		1: '/dashboard/sales',
-		2: '/dashboard/purchase',
-		3: '/dashboard/expenses',
-		4: '/dashboard/products',
-		5: '/dashboard/customers',
-		6: '/dashboard/users',
-		7: '/dashboard/reports'
+	const toggleSubmenu = () => {
+		showSubmenu = !showSubmenu;
 	};
-
-	const handleTileClick = (i: number) => {
-		goto(urls[i]);
-	};
-	$: currentTile && handleTileClick(currentTile);
-	
 </script>
 
 <AppRail>
-	<AppRailTile
-		bind:group={currentTile}
-		name="Home"
-		value={0}
-		title="Home"
-		on:click={() => handleTileClick(0)}
-	>
+	<AppRailAnchor title="Home" href="/dashboard" selected={$page.url.pathname === '/dashboard'}>
 		<svelte:fragment slot="lead">
 			<div class="flex items-center justify-center">
 				<Home />
 			</div>
 		</svelte:fragment>
 		<span>Home</span>
-	</AppRailTile>
-	<AppRailTile
-		bind:group={currentTile}
-		name="Sales Order"
-		value={1}
+	</AppRailAnchor>
+	<AppRailAnchor
 		title="Sales Order"
-		on:click={() => currentTile + 1}
+		href="/dashboard/sales"
+		selected={$page.url.pathname === '/dashboard/sales'}
 	>
 		<svelte:fragment slot="lead">
 			<div class="flex items-center justify-center">
@@ -51,13 +30,11 @@
 			</div>
 		</svelte:fragment>
 		<span>Sales Order</span>
-	</AppRailTile>
-	<!-- <AppRailTile
-		bind:group={currentTile}
-		name="Purchase Order"
-		value={2}
+	</AppRailAnchor>
+	<!-- <AppRailAnchor
 		title="Purchase Order"
-		on:click={() => currentTile + 1}
+		href="/dashboard/purchase"
+		selected={$page.url.pathname === '/dashboard/purchase'}
 	>
 		<svelte:fragment slot="lead">
 			<div class="flex items-center justify-center">
@@ -65,13 +42,11 @@
 			</div>
 		</svelte:fragment>
 		<span>Purchase Order</span>
-	</AppRailTile> -->
-	<AppRailTile
-		bind:group={currentTile}
-		name="Expenses"
-		value={3}
+	</AppRailAnchor> -->
+	<AppRailAnchor
 		title="Expenses"
-		on:click={() => currentTile + 1}
+		href="/dashboard/expenses"
+		selected={$page.url.pathname === '/dashboard/expenses'}
 	>
 		<svelte:fragment slot="lead">
 			<div class="flex items-center justify-center">
@@ -79,13 +54,11 @@
 			</div>
 		</svelte:fragment>
 		<span>Expenses</span>
-	</AppRailTile>
-	<AppRailTile
-		bind:group={currentTile}
-		name="Products"
-		value={4}
+	</AppRailAnchor>
+	<AppRailAnchor
 		title="Products"
-		on:click={() => currentTile + 1}
+		href="/dashboard/products"
+		selected={$page.url.pathname === '/dashboard/products'}
 	>
 		<svelte:fragment slot="lead">
 			<div class="flex items-center justify-center">
@@ -93,13 +66,11 @@
 			</div>
 		</svelte:fragment>
 		<span>Products</span>
-	</AppRailTile>
-	<AppRailTile
-		bind:group={currentTile}
-		name="Customers"
-		value={5}
+	</AppRailAnchor>
+	<AppRailAnchor
 		title="Customers"
-		on:click={() => currentTile + 1}
+		href="/dashboard/customers"
+		selected={$page.url.pathname === '/dashboard/customers'}
 	>
 		<svelte:fragment slot="lead">
 			<div class="flex items-center justify-center">
@@ -107,13 +78,11 @@
 			</div>
 		</svelte:fragment>
 		<span>Customers</span>
-	</AppRailTile>
-	<AppRailTile
-		bind:group={currentTile}
-		name="Users"
-		value={6}
+	</AppRailAnchor>
+	<AppRailAnchor
 		title="Users"
-		on:click={() => currentTile + 1}
+		href="/dashboard/users"
+		selected={$page.url.pathname === '/dashboard/users'}
 	>
 		<svelte:fragment slot="lead">
 			<div class="flex items-center justify-center">
@@ -121,13 +90,11 @@
 			</div>
 		</svelte:fragment>
 		<span>Users</span>
-	</AppRailTile>
-	<AppRailTile
-		bind:group={currentTile}
-		name="Reports"
-		value={7}
+	</AppRailAnchor>
+	<AppRailAnchor
 		title="Reports"
-		on:click={() => currentTile + 1}
+		href="/dashboard/reports"
+		selected={$page.url.pathname === '/dashboard/reports'}
 	>
 		<svelte:fragment slot="lead">
 			<div class="flex items-center justify-center">
@@ -135,5 +102,5 @@
 			</div>
 		</svelte:fragment>
 		<span>Reports</span>
-	</AppRailTile>
+	</AppRailAnchor>
 </AppRail>
