@@ -149,25 +149,25 @@
 	} satisfies PaginationSettings;
 
 	// pagination event handlers
-	function onPageChange(e: CustomEvent): void {
+	const onPageChange = (e: CustomEvent): void => {
 		paginationSettings.page = e.detail;
 		updateTable(sourceData);
-	}
+	};
 
 	// pagination event handlers
-	function onAmountChange(e: CustomEvent): void {
+	const onAmountChange = (e: CustomEvent): void => {
 		paginationSettings.limit = e.detail;
 		updateTable(sourceData);
-	}
+	};
 
 	onMount(async () => {
 		await loadData();
 	});
 
 	// table row select handler
-	function tableSelectHandler(e: CustomEvent): void {
+	const tableSelectHandler = (e: CustomEvent): void => {
 		goto(`/dashboard/expenses/${e.detail[1]}`);
-	}
+	};
 
 	const expensesData = (data: any) => {
 		totalExpenses = 0;

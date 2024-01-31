@@ -8,11 +8,7 @@
 		Table,
 		tableMapperValues
 	} from '@skeletonlabs/skeleton';
-	import type {
-		DrawerSettings,
-		PaginationSettings,
-		TableSource,
-	} from '@skeletonlabs/skeleton';
+	import type { DrawerSettings, PaginationSettings, TableSource } from '@skeletonlabs/skeleton';
 	import Create from '$lib/components/forms/product/Create.svelte';
 
 	let keyword: string = '';
@@ -37,7 +33,7 @@
 			let result = await response.json();
 			sourceData = result.response;
 
-			if(sourceData) updateTable(sourceData);
+			if (sourceData) updateTable(sourceData);
 		} catch (error) {
 			console.error(error);
 		}
@@ -81,18 +77,8 @@
 			paginationSettings.page * paginationSettings.limit,
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
-		table.body = tableMapperValues(paginatedData, [
-			'name',
-			'category',
-			'price',
-			'status',
-		]);
-		table.meta = tableMapperValues(paginatedData, [
-			'_id',
-			'category',
-			'price',
-			'status',
-		]);
+		table.body = tableMapperValues(paginatedData, ['name', 'category', 'price', 'status']);
+		table.meta = tableMapperValues(paginatedData, ['_id', 'category', 'price', 'status']);
 		table.foot = ['Total', '', '', `<code class="code">${sourceData.length}</code>`];
 	};
 
@@ -104,25 +90,25 @@
 	} satisfies PaginationSettings;
 
 	// pagination event handlers
-	function onPageChange(e: CustomEvent): void {
+	const onPageChange = (e: CustomEvent): void => {
 		paginationSettings.page = e.detail;
 		updateTable(sourceData);
-	}
+	};
 
 	// pagination event handlers
-	function onAmountChange(e: CustomEvent): void {
+	const onAmountChange = (e: CustomEvent): void => {
 		paginationSettings.limit = e.detail;
 		updateTable(sourceData);
-	}
+	};
 
 	onMount(async () => {
 		await loadData();
 	});
 
 	// table row select handler
-	function tableSelectHandler(e: CustomEvent): void {
+	const tableSelectHandler = (e: CustomEvent): void => {
 		goto(`/dashboard/products/${e.detail[0]}`);
-	}
+	};
 
 	$: filterTable(keyword);
 </script>
