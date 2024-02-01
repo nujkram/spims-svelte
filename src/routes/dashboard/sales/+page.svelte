@@ -242,7 +242,6 @@
 
 	$: filterTable(keyword);
 	$: filterByDate(new Date(startDate), new Date(endDate));
-	$: user = $page.data.user;
 </script>
 
 <div class="card mb-4">
