@@ -157,7 +157,7 @@
 			'paymentMethod'
 		]);
 
-		if (user == 'Administrator') {
+		if ($page.data.user.role == 'ADMINISTRATOR') {
 			table.foot = [
 				'Total',
 				`<div class="variant-filled-success px-2 rounded">${formatCurrency(

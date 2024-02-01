@@ -74,7 +74,7 @@
 		</svelte:fragment>
 		<span>Customers</span>
 	</AppRailAnchor>
-	{#if user?.role === 'Administrator'}
+	{#if user?.role === 'ADMINISTRATOR'}
 		<AppRailAnchor
 			title="Users"
 			href="/dashboard/users"
