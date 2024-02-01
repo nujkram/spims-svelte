@@ -21,8 +21,12 @@
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 	initializeStores();
 
+	let user: any[] = [];
+
 	$: {
-		if (!$page.data.user) {
+		user = $page.data.user;
+
+		if (!user) {
 			goto('/');
 		}
 	}
@@ -34,7 +38,7 @@
 	};
 
 	const handleLogout = () => {
-		goto('auth/logout/');
+		goto('/auth/logout/');
 	}
 
 	const drawerSettings: DrawerSettings = {
@@ -55,7 +59,7 @@
 </script>
 
 <Drawer>
-	<Sidebar />
+	<Sidebar {user} />
 </Drawer>
 <!-- App Shell -->
 <AppShell slotSidebarLeft="w-0 lg:w-20">
@@ -92,7 +96,7 @@
 				</a>
 				<LightSwitch />
 				{#if $page.data.user}
-					<button class="btn variant-filled w-24" use:popup={popupClick}>Hi, {$page.data.user.firstName}</button>
+					<button class="btn variant-filled w-auto" use:popup={popupClick}>Hi, {$page.data.user.firstName || 'User'}</button>
 					<div class="card p-4 bg-gray-900" data-popup="popupClick">
 						<button
 							type="button"
@@ -107,7 +111,7 @@
 	</svelte:fragment>
 	<svelte:fragment slot="sidebarLeft">
 		{#if $page.data.user}
-			<Sidebar />
+			<Sidebar {user} />
 		{/if}
 	</svelte:fragment>
 	<!-- Page Route Content -->

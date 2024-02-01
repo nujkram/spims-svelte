@@ -9,6 +9,8 @@ export const POST = async ({ request, locals }: any) => {
 
 	for (const key in data) {
         if(key === '_id') continue;
+		if(key === 'username') continue;
+		if(key === 'password') continue;
         if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
 		if(key === 'email') data[key] = data[key].toLowerCase();
     }

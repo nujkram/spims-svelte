@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import Chart from 'chart.js/auto';
 	import { Box, Cart, FileBarGraph, Home, People, Tag, Wallet } from '$lib/components/icons/index';
@@ -6,13 +7,17 @@
 	export let data;
 
 	let { customers, users, salesSummary, expensesSummary } = data;
+
 	onMount(() => {
+		if(user?.role !== 'Administrator') return;
 		// sales order chart
 		const salesDate = salesSummary.map((s) => dateToString(s._id, 'MMM dd yyyy'));
-		const salesIncome = salesSummary.map((s) => parseFloat(s.totalDownpayment) + parseFloat(s.totalPayments));
-        const salesAmount = salesSummary.map((s) => parseFloat(s.totalAmount));
-        const salesBalance = salesSummary.map((s) => parseFloat(s.totalBalance));
-        // get sales amount from sales order with the same createdAt date
+		const salesIncome = salesSummary.map(
+			(s) => parseFloat(s.totalDownpayment) + parseFloat(s.totalPayments)
+		);
+		const salesAmount = salesSummary.map((s) => parseFloat(s.totalAmount));
+		const salesBalance = salesSummary.map((s) => parseFloat(s.totalBalance));
+		// get sales amount from sales order with the same createdAt date
 		const salesCtx = document.getElementById('salesOrderChart');
 
 		// expenses chart
@@ -39,7 +44,7 @@
 						backgroundColor: 'rgb(75, 192, 192)',
 						tension: 0.1
 					},
-                    {
+					{
 						label: 'Balance',
 						data: salesBalance,
 						fill: false,
@@ -66,6 +71,8 @@
 			}
 		});
 	});
+
+	$: user = $page.data.user;
 </script>
 
 <div class="flex gap-4 justify-end">
@@ -89,23 +96,25 @@
 	</div>
 </div>
 
-<div class="grid grid-cols-2 w-full gap-4">
-	<div class="card mb-4 col-span-2 md:col-span-1">
-		<header class="flex card-header gap-2 items-center">
-            <Cart />
-			<h1 class="h3">Sales Order</h1>
-		</header>
-		<section class="flex p-4 w-full gap-4">
-			<canvas id="salesOrderChart"></canvas>
-		</section>
+{#if user?.role === 'Administrator'}
+	<div class="grid grid-cols-2 w-full gap-4">
+		<div class="card mb-4 col-span-2 md:col-span-1">
+			<header class="flex card-header gap-2 items-center">
+				<Cart />
+				<h1 class="h3">Sales Order</h1>
+			</header>
+			<section class="flex p-4 w-full gap-4">
+				<canvas id="salesOrderChart"></canvas>
+			</section>
+		</div>
+		<div class="card mb-4 col-span-2 md:col-span-1">
+			<header class="flex card-header gap-2 items-center">
+				<Wallet />
+				<h1 class="h3">Expenses</h1>
+			</header>
+			<section class="flex p-4 w-full gap-4">
+				<canvas id="expensesChart"></canvas>
+			</section>
+		</div>
 	</div>
-	<div class="card mb-4 col-span-2 md:col-span-1">
-		<header class="flex card-header gap-2 items-center">
-            <Wallet />
-			<h1 class="h3">Expenses</h1>
-		</header>
-		<section class="flex p-4 w-full gap-4">
-			<canvas id="expensesChart"></canvas>
-		</section>
-	</div>
-</div>
+{/if}
