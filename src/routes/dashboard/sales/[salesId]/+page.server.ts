@@ -71,6 +71,6 @@ export async function load({ params }) {
         sales.totalPayment = 0;
     }
     sales.balance = parseFloat(sales.amount) - (parseFloat(sales.downpayment) + parseFloat(sales.totalPayment));
-
+    sales.income = parseFloat(sales.totalPayment) - parseFloat(sales.expense);
     return { sales };
 }
