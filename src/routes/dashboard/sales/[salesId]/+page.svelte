@@ -25,15 +25,13 @@
 	let productData: any = [];
 	let cartData: any = [];
 	let tableProducts: TableSource = {
-		head: ['Name', 'Price', 'Quantity', 'Total'],
+		head: ['Name', 'Price', 'Quantity', 'Subtotal'],
 		body: tableMapperValues(sales?.cart, ['name', 'price', 'quantity', 'subtotal']),
-		foot: ['Total', '', '', formatCurrency(sales?.amount || 0)]
 	};
 
 	let tablePayments: TableSource = {
-		head: ['Transaction Date', 'MOD', 'Amount'],
+		head: ['Date', 'MOD', 'Amount'],
 		body: tableMapperValues(sales?.payments || [], ['createdAt', 'paymentMethod', 'amount']),
-		foot: ['Total', formatCurrency(sales?.totalPayment || 0)]
 	};
 
 	const toastStore = getToastStore();
@@ -130,97 +128,65 @@
 		await loadData();
 	});
 </script>
-
 <div class="card p-4">
-	<header class="card-header flex justify-center">
+	<header class="card-header flex items-center gap-4">
 		<Avatar initials={fullNameInitial} background="bg-primary-500" fontSize={250} width="w-28" />
-	</header>
-	<section class="p-4 flex flex-col items-center">
 		<h1 class="h1">{sales?.customer?.fullName || 'NA'}</h1>
-		<h2 class="h2 italic">{sales?.customer?.company || 'NA'}</h2>
-		<div class="flex flex-col md:flex-row w-full gap-4 justify-between mt-4">
-			<div class="flex flex-col items-center">
-				<h3 class="h3">TIN</h3>
-				<p class="p">{sales?.customer?.tin || 'NA'}</p>
+	</header>
+	<section class="p-4 flex flex-col md:flex-row gap-4">
+		<div class="flex flex-col w-full gap-4 border-r-0 md:border-r">
+			<div class="flex flex-col">
+				<h4 class="h4">Date</h4>
+				<p class="p text-lg">{sales?.createdAt ? dateToString(sales?.createdAt) : 'NA'}</p>
 			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Email</h3>
-				<p class="p">{sales?.customer?.email || 'NA'}</p>
+			<div class="flex flex-col">
+				<h4 class="h4">Email</h4>
+				<p class="p text-lg">{sales?.customer?.email || 'NA'}</p>
 			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Phone</h3>
-				<p class="p">{sales?.customer?.phone || 'NA'}</p>
+			<div class="flex flex-col">
+				<h4 class="h4">TIN</h4>
+				<p class="p text-lg">{sales?.customer?.tin || 'NA'}</p>
 			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Address</h3>
-				<p class="p">{sales?.customer?.address || 'NA'}</p>
+			<div class="flex flex-col">
+				<h4 class="h4">Phone</h4>
+				<p class="p text-lg">{sales?.customer?.phone || 'NA'}</p>
 			</div>
-		</div>
-		<div class="flex flex-col md:flex-row w-full gap-4 justify-between mt-4">
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Created At</h3>
-				<p class="p">{sales?.createdAt ? dateToString(sales?.createdAt) : 'NA'}</p>
+			<div class="flex flex-col">
+				<h4 class="h4">Address</h4>
+				<p class="p text-lg">{sales?.customer?.address || 'NA'}</p>
 			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Created By</h3>
-				<p class="p">{sales?.createdBy.fullName || 'NA'}</p>
-			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Update At</h3>
-				<p class="p">{sales?.updatedAt ? dateToString(sales?.updatedAt) : 'NA'}</p>
-			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Update By</h3>
-				<p class="p">{sales?.updatedBy.fullName || 'NA'}</p>
+			<div class="flex flex-col">
+				<h4 class="h4">Date Updated</h4>
+				<p class="p text-lg">{sales?.updatedAt ? dateToString(sales?.updatedAt) : 'NA'}</p>
 			</div>
 		</div>
-		<h2 class="h2 border-t-2 pt-4 mt-6 w-full text-center">
-			{formatCurrency(stringToDecimal(sales?.balance)) || 0.0}
-		</h2>
-		<p class="p text-xl">Balance</p>
-		<div class="flex flex-col md:flex-row w-full gap-4 justify-between mt-4">
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Official Receipt</h3>
-				<p class="p">{sales?.receipt || 'NA'}</p>
+		<div class="flex flex-col w-full gap-4">
+			<div class="flex flex-col w-full">
+				<h2 class="h2 mb-4 w-full">Cart</h2>
+				<Table source={tableProducts} />
 			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Downpayment</h3>
-				<p class="p w-full text-right">{formatCurrency(sales?.downpayment) || 'NA'}</p>
+			<div class="flex flex-col w-full px-3">
+				<div class="flex justify-between">
+					<p>Total</p>
+					<p>{formatCurrency(sales?.amount) || 0.0}</p>
+				</div>
+				<div class="flex justify-between">
+					<p>Downpayment</p>
+					<p>{formatCurrency(sales?.downpayment) || 0.0}</p>
+				</div>
+				<div class="flex justify-between">
+					<p>Payment</p>
+					<p>{formatCurrency(sales?.totalPayment) || 0.0}</p>
+				</div>
+				<div class="flex justify-between">
+					<p>Balance</p>
+					<p>{formatCurrency(sales?.balance) || 0.0}</p>
+				</div>
 			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Total Amount</h3>
-				<p class="p w-full text-right">{formatCurrency(sales?.amount) || 'NA'}</p>
+			<div class="flex flex-col w-full">
+				<h2 class="h2 mb-4 w-full">Payments</h2>
+				<Table source={tablePayments} />
 			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Payment Method</h3>
-				<p class="p">{sales?.paymentMethod || 'NA'}</p>
-			</div>
-		</div>
-		<div class="flex flex-col md:flex-row w-full gap-4 justify-between mt-4">
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Created At</h3>
-				<p class="p">{sales?.createdAt ? dateToString(sales?.createdAt) : 'NA'}</p>
-			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Created By</h3>
-				<p class="p">{sales?.createdBy.fullName || 'NA'}</p>
-			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Update At</h3>
-				<p class="p">{sales?.updatedAt ? dateToString(sales?.updatedAt) : 'NA'}</p>
-			</div>
-			<div class="flex flex-col items-center">
-				<h3 class="h3">Update By</h3>
-				<p class="p">{sales?.updatedBy.fullName || 'NA'}</p>
-			</div>
-		</div>
-		<div class="flex flex-col w-full mt-6">
-			<h2 class="h2 pt-4 my-4 w-full">Cart</h2>
-			<Table source={tableProducts} />
-		</div>
-		<div class="flex flex-col w-full mt-6">
-			<h2 class="h2 pt-4 my-4 w-full">Payment Transactions</h2>
-			<Table source={tablePayments} />
 		</div>
 	</section>
 	<footer class="card-footer flex justify-end border-t-2 p-4">
