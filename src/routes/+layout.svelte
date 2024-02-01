@@ -38,7 +38,7 @@
 	};
 
 	const handleLogout = () => {
-		goto('auth/logout/');
+		goto('/auth/logout/');
 	}
 
 	const drawerSettings: DrawerSettings = {
