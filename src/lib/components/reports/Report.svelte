@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Table, Paginator, tableMapperValues } from '@skeletonlabs/skeleton';
+	import { Table, Paginator, tableMapperValues, filter } from '@skeletonlabs/skeleton';
 	import type { PaginationSettings, TableSource } from '@skeletonlabs/skeleton';
 	import { Download } from '$lib/components/icons/index';
 	import {
@@ -23,6 +23,7 @@
 	let totalPayment: number = 0;
 	let totalBalance: number = 0;
 	let businesses: any[] = [];
+	let filteredData: any = [];
 
 	let table: TableSource = {
 		// A list of heading labels.
@@ -59,7 +60,7 @@
 		paginationSettings.page = 0;
 		let tempData = sourceData;
 		if (keyword.length > 0) {
-			let filteredData = tempData.filter((item: any) => {
+			filteredData = tempData.filter((item: any) => {
 				return (
 					item.customer.includes(keyword.toUpperCase()) ||
 					item?.address.includes(keyword.toUpperCase()) ||
@@ -68,6 +69,7 @@
 			});
 			updateTable(filteredData);
 		} else {
+			filteredData = [];
 			updateTable(sourceData);
 		}
 	};
@@ -78,7 +80,7 @@
 		paginationSettings.page = 0;
 		let tempData = sourceData;
 		business = '';
-		let filteredData = tempData.filter((item: any) => {
+		filteredData = tempData.filter((item: any) => {
 			return new Date(item.createdAt) >= start && new Date(item.createdAt) <= end;
 		});
 		updateTable(filteredData);
@@ -88,8 +90,11 @@
 		sourceData = salesData(sourceData);
 		paginationSettings.page = 0;
 		let tempData = sourceData;
-		if (business === '') return updateTable(sourceData);
-		let filteredData = tempData.filter((item: any) => {
+		if (business === '') {
+			filteredData = [];
+			return updateTable(sourceData);
+		}
+		filteredData = tempData.filter((item: any) => {
 			return item.business === business;
 		});
 		updateTable(filteredData);
@@ -206,24 +211,45 @@
 
 		csvContent += ',Date,Business,Customer,Company,Addess,OR No,Amount,DP,Payment,Balance,MOD\n';
 
-		sourceData.forEach((item: any) => {
-			// Convert numbers to strings and enclose fields with commas in double quotes
-			const row = [
-				item.createdAt,
-				item.business,
-				item.customer,
-				item.company,
-				`"${item.address}"`,
-				item.receipt,
-				`"${item.amount}"`,
-				`"${item.downpayment}"`,
-				`"${item.totalPayment}"`,
-				`"${item.balance}"`,
-				item.paymentMethod
-			];
+		if (filteredData.length > 0) {
+			filteredData.forEach((item: any) => {
+				// Convert numbers to strings and enclose fields with commas in double quotes
+				const row = [
+					item.createdAt,
+					item.business,
+					item.customer,
+					item.company,
+					`"${item.address}"`,
+					item.receipt,
+					`"${item.amount}"`,
+					`"${item.downpayment}"`,
+					`"${item.totalPayment}"`,
+					`"${item.balance}"`,
+					item.paymentMethod
+				];
 
-			csvContent += row.join(',') + '\n';
-		});
+				csvContent += row.join(',') + '\n';
+			});
+		} else {
+			sourceData.forEach((item: any) => {
+				// Convert numbers to strings and enclose fields with commas in double quotes
+				const row = [
+					item.createdAt,
+					item.business,
+					item.customer,
+					item.company,
+					`"${item.address}"`,
+					item.receipt,
+					`"${item.amount}"`,
+					`"${item.downpayment}"`,
+					`"${item.totalPayment}"`,
+					`"${item.balance}"`,
+					item.paymentMethod
+				];
+
+				csvContent += row.join(',') + '\n';
+			});
+		}
 
 		const summary = [
 			'\n',
