@@ -9,7 +9,7 @@
 	let { customers, users, salesSummary, expensesSummary } = data;
 
 	onMount(() => {
-		if(user?.role !== 'Administrator') return;
+		if(user?.role !== 'ADMINISTRATOR') return;
 		// sales order chart
 		const salesDate = salesSummary.map((s) => dateToString(s._id, 'MMM dd yyyy'));
 		const salesIncome = salesSummary.map(
@@ -96,7 +96,7 @@
 	</div>
 </div>
 
-{#if user?.role === 'Administrator'}
+{#if user?.role === 'ADMINISTRATOR'}
 	<div class="grid grid-cols-2 w-full gap-4">
 		<div class="card mb-4 col-span-2 md:col-span-1">
 			<header class="flex card-header gap-2 items-center">
