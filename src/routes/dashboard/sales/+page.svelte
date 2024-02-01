@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import {
 		Drawer,
@@ -155,19 +156,26 @@
 			'balance',
 			'paymentMethod'
 		]);
-		table.foot = [
-			'Total',
-			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalDownpayment + totalPayment)}</div>`,
-			'',
-			'',
-			'',
-			'',
-			`<div class="variant-filled-secondary px-2 rounded">${formatCurrency(totalSales)}</div>`,
-			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalDownpayment)}</div>`,
-			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalPayment)}</div>`,
-			`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalBalance)}</div>`,
-			`<code class="code">${sourceData.length}</code>`
-		];
+
+		if (user == 'Administrator') {
+			table.foot = [
+				'Total',
+				`<div class="variant-filled-success px-2 rounded">${formatCurrency(
+					totalDownpayment + totalPayment
+				)}</div>`,
+				'',
+				'',
+				'',
+				'',
+				`<div class="variant-filled-secondary px-2 rounded">${formatCurrency(totalSales)}</div>`,
+				`<div class="variant-filled-success px-2 rounded">${formatCurrency(
+					totalDownpayment
+				)}</div>`,
+				`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalPayment)}</div>`,
+				`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalBalance)}</div>`,
+				`<code class="code">${sourceData.length}</code>`
+			];
+		}
 	};
 
 	let paginationSettings = {
@@ -208,7 +216,9 @@
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
 			totalPayment += parseFloat(stringToDecimal(item?.totalPayment || 0));
 			totalBalance +=
-				parseFloat(stringToDecimal(item.amount)) - (parseFloat(stringToDecimal(item.downpayment)) + parseFloat(stringToDecimal(item.totalPayment || 0)));
+				parseFloat(stringToDecimal(item.amount)) -
+				(parseFloat(stringToDecimal(item.downpayment)) +
+					parseFloat(stringToDecimal(item.totalPayment || 0)));
 
 			return {
 				...item,
@@ -232,6 +242,7 @@
 
 	$: filterTable(keyword);
 	$: filterByDate(new Date(startDate), new Date(endDate));
+	$: user = $page.data.user;
 </script>
 
 <div class="card mb-4">

@@ -21,8 +21,12 @@
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 	initializeStores();
 
+	let user: any[] = [];
+
 	$: {
-		if (!$page.data.user) {
+		user = $page.data.user;
+
+		if (!user) {
 			goto('/');
 		}
 	}
@@ -55,7 +59,7 @@
 </script>
 
 <Drawer>
-	<Sidebar />
+	<Sidebar {user} />
 </Drawer>
 <!-- App Shell -->
 <AppShell slotSidebarLeft="w-0 lg:w-20">
@@ -107,7 +111,7 @@
 	</svelte:fragment>
 	<svelte:fragment slot="sidebarLeft">
 		{#if $page.data.user}
-			<Sidebar />
+			<Sidebar {user} />
 		{/if}
 	</svelte:fragment>
 	<!-- Page Route Content -->

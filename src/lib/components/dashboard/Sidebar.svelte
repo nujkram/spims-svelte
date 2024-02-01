@@ -2,12 +2,7 @@
 	import { page } from '$app/stores';
 	import { AppRail, AppRailAnchor } from '@skeletonlabs/skeleton';
 	import { Box, Cart, FileBarGraph, Home, People, Tag, Wallet } from '$lib/components/icons/index';
-
-	let showSubmenu = false;
-
-	const toggleSubmenu = () => {
-		showSubmenu = !showSubmenu;
-	};
+	export let user: any;
 </script>
 
 <AppRail>
@@ -79,28 +74,30 @@
 		</svelte:fragment>
 		<span>Customers</span>
 	</AppRailAnchor>
-	<AppRailAnchor
-		title="Users"
-		href="/dashboard/users"
-		selected={$page.url.pathname === '/dashboard/users'}
-	>
-		<svelte:fragment slot="lead">
-			<div class="flex items-center justify-center">
-				<People />
-			</div>
-		</svelte:fragment>
-		<span>Users</span>
-	</AppRailAnchor>
-	<AppRailAnchor
-		title="Reports"
-		href="/dashboard/reports"
-		selected={$page.url.pathname === '/dashboard/reports'}
-	>
-		<svelte:fragment slot="lead">
-			<div class="flex items-center justify-center">
-				<FileBarGraph />
-			</div>
-		</svelte:fragment>
-		<span>Reports</span>
-	</AppRailAnchor>
+	{#if user?.role === 'Administrator'}
+		<AppRailAnchor
+			title="Users"
+			href="/dashboard/users"
+			selected={$page.url.pathname === '/dashboard/users'}
+		>
+			<svelte:fragment slot="lead">
+				<div class="flex items-center justify-center">
+					<People />
+				</div>
+			</svelte:fragment>
+			<span>Users</span>
+		</AppRailAnchor>
+		<AppRailAnchor
+			title="Reports"
+			href="/dashboard/reports"
+			selected={$page.url.pathname === '/dashboard/reports'}
+		>
+			<svelte:fragment slot="lead">
+				<div class="flex items-center justify-center">
+					<FileBarGraph />
+				</div>
+			</svelte:fragment>
+			<span>Reports</span>
+		</AppRailAnchor>
+	{/if}
 </AppRail>
