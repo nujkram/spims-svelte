@@ -10,8 +10,8 @@
 	} from '$lib/utils/currencyHelper';
 	import dateToString from '$lib/utils/dateHelper';
 
-	export let sales: any;
-	// export let expenses: any;
+	export let sales: any[];
+	export let expenses: any;
 
 	let keyword: string = '';
 	let startDate: string = '';
@@ -22,8 +22,6 @@
 	let totalDownpayment: number = 0;
 	let totalPayment: number = 0;
 	let totalBalance: number = 0;
-	// get unique business in sales
-
 	let businesses: any[] = [];
 
 	let table: TableSource = {
@@ -79,6 +77,7 @@
 		sourceData = salesData(sourceData);
 		paginationSettings.page = 0;
 		let tempData = sourceData;
+		business = '';
 		let filteredData = tempData.filter((item: any) => {
 			return new Date(item.createdAt) >= start && new Date(item.createdAt) <= end;
 		});
@@ -250,9 +249,6 @@
 		document.body.appendChild(link);
 		link.click();
 	};
-
-	$: filterTable(keyword);
-	$: filterByDate(new Date(startDate), new Date(endDate));
 </script>
 
 <div class="p-4">
