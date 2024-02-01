@@ -9,6 +9,7 @@
 	let { customers, users, salesSummary, expensesSummary } = data;
 
 	onMount(() => {
+		if(user?.role !== 'Administrator') return;
 		// sales order chart
 		const salesDate = salesSummary.map((s) => dateToString(s._id, 'MMM dd yyyy'));
 		const salesIncome = salesSummary.map(
