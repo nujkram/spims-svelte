@@ -32,8 +32,8 @@
 			'Business',
 			'Customer',
 			'Company',
-			'Addess',
 			'OR No',
+			'Description',
 			'Amount',
 			'DP',
 			'Payment',
@@ -46,8 +46,8 @@
 			'business',
 			'customer',
 			'company',
-			'address',
 			'receipt',
+			'description',
 			'amount',
 			'downpayment',
 			'totalPayment',
@@ -112,8 +112,8 @@
 			'business',
 			'customer',
 			'company',
-			'address',
 			'receipt',
+			'description',
 			'amount',
 			'downpayment',
 			'totalPayment',
@@ -125,8 +125,8 @@
 			'business',
 			'customer',
 			'company',
-			'address',
 			'receipt',
+			'description',
 			'amount',
 			'downpayment',
 			'totalPayment',
@@ -209,7 +209,7 @@
 	const downloadCsv = () => {
 		let csvContent = 'data:text/csv;charset=utf-8';
 
-		csvContent += ',Date,Business,Customer,Company,Addess,OR No,Amount,DP,Payment,Balance,MOD\n';
+		csvContent += ',Date,Business,Customer,Company,OR No,Description,Amount,DP,Payment,Balance,MOD\n';
 
 		if (filteredData.length > 0) {
 			filteredData.forEach((item: any) => {
@@ -219,8 +219,8 @@
 					item.business,
 					item.customer,
 					item.company,
-					`"${item.address}"`,
 					item.receipt,
+					`"${item.description}"`,
 					`"${item.amount}"`,
 					`"${item.downpayment}"`,
 					`"${item.totalPayment}"`,
