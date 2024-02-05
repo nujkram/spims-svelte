@@ -47,7 +47,7 @@
 			{#if tabSet === 0}
 				<Report {sales} {expenses} />
 			{:else if tabSet === 1}
-				<IncomeStatement {incomeStatement} />
+				<IncomeStatement {incomeStatement} {salesSummary} {expensesSummary} />
 			{:else if tabSet === 2}
 				<div class="p-4">Coming soon...</div>
 			{/if}
