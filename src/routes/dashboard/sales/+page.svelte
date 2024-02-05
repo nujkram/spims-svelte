@@ -37,8 +37,8 @@
 			'Business',
 			'Customer',
 			'Company',
-			'Addess',
 			'OR No',
+			'Description',
 			'Amount',
 			'DP',
 			'Payment',
@@ -51,8 +51,8 @@
 			'business',
 			'customer',
 			'company',
-			'address',
 			'receipt',
+			'description',
 			'amount',
 			'downpayment',
 			'totalPayment',
@@ -135,8 +135,8 @@
 			'business',
 			'customer',
 			'company',
-			'address',
 			'receipt',
+			'description',
 			'amount',
 			'downpayment',
 			'totalPayment',
@@ -148,8 +148,8 @@
 			'business',
 			'_id',
 			'company',
-			'address',
 			'receipt',
+			'description',
 			'amount',
 			'downpayment',
 			'totalPayment',
@@ -229,7 +229,7 @@
 				company:
 					customerData.find((customer: any) => customer._id === item.customerId).company || '',
 				description: item.cart.map((cart: any) => {
-					return ` [${cart.name}, ${cart.price} x ${cart.quantity} = ${cart.subtotal || 0.0}]`;
+					return ` [${cart.name}, ${cart.price} x ${cart.quantity} = ${cart.subtotal || 0.0}] <br>`;
 				}),
 				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
 				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
