@@ -10,17 +10,14 @@
 	} from '$lib/utils/currencyHelper';
 	import dateToString from '$lib/utils/dateHelper';
 
-	export let sales: any[];
+	export let expenses: any;
 
 	let keyword: string = '';
 	let startDate: string = '';
 	let endDate: string = '';
 	let business: string = '';
-	let sourceData: any = sales;
-	let totalSales: number = 0;
-	let totalDownpayment: number = 0;
-	let totalPayment: number = 0;
-	let totalBalance: number = 0;
+	let sourceData: any = expenses;
+	let totalExpenses: number = 0;
 	let businesses: any[] = [];
 	let filteredData: any = [];
 
@@ -29,29 +26,21 @@
 		head: [
 			'Date',
 			'Business',
-			'Customer',
-			'Company',
-			'OR No',
+			'Name',
+			'Invoice',
 			'Description',
+			'Items',
 			'Amount',
-			'DP',
-			'Payment',
-			'Balance',
-			'MOD'
 		],
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, [
 			'createdAt',
 			'business',
-			'customer',
-			'company',
-			'receipt',
+			'name',
+			'invoice',
 			'description',
-			'amount',
-			'downpayment',
-			'totalPayment',
-			'balance',
-			'paymentMethod'
+			'items',
+			'totalAmount',
 		])
 	};
 
@@ -75,7 +64,7 @@
 
 	// filter sourceData createdAt by date between start and end
 	const filterByDate = (start: Date, end: Date) => {
-		sourceData = salesData(sourceData);
+		sourceData = expensesData(sourceData);
 		paginationSettings.page = 0;
 		let tempData = sourceData;
 		business = '';
@@ -86,7 +75,7 @@
 	};
 
 	const filterByBusiness = (business: string) => {
-		sourceData = salesData(sourceData);
+		sourceData = expensesData(sourceData);
 		paginationSettings.page = 0;
 		let tempData = sourceData;
 		if (business === '') {
@@ -100,7 +89,7 @@
 	};
 
 	const updateTable = (sourceData: any) => {
-		sourceData = salesData(sourceData);
+		sourceData = expensesData(sourceData);
 		paginationSettings.size = sourceData.length;
 		let paginatedData = sourceData.slice(
 			paginationSettings.page * paginationSettings.limit,
@@ -109,43 +98,29 @@
 		table.body = tableMapperValues(paginatedData, [
 			'createdAt',
 			'business',
-			'customer',
-			'company',
-			'receipt',
+			'name',
+			'invoice',
 			'description',
-			'amount',
-			'downpayment',
-			'totalPayment',
-			'balance',
-			'paymentMethod'
+			'items',
+			'totalAmount',
 		]);
 		table.meta = tableMapperValues(paginatedData, [
 			'createdAt',
 			'business',
-			'customer',
-			'company',
-			'receipt',
+			'name',
+			'invoice',
 			'description',
-			'amount',
-			'downpayment',
-			'totalPayment',
-			'balance',
-			'paymentMethod'
+			'items',
+			'totalAmount',
 		]);
 		table.foot = [
 			'Total',
-			`<div class="variant-filled-success px-2 rounded">${formatCurrency(
-				totalDownpayment + totalPayment
-			)}</div>`,
 			'',
 			'',
 			'',
 			'',
-			`<div class="variant-filled-secondary px-2 rounded">${formatCurrency(totalSales)}</div>`,
-			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalDownpayment)}</div>`,
-			`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalPayment)}</div>`,
-			`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalBalance)}</div>`,
-			`<code class="code">${sourceData.length}</code>`
+			`<code class="code">${sourceData.length}</code>`,
+			`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalExpenses)}</div>`
 		];
 	};
 
@@ -168,47 +143,32 @@
 		updateTable(sourceData);
 	};
 
-	const salesData = (data: any) => {
-		totalSales = 0;
-		totalDownpayment = 0;
-		totalPayment = 0;
-		totalBalance = 0;
+	const expensesData = (data: any) => {
+		totalExpenses = 0;
 		return data.map((item: any) => {
-			totalSales += parseFloat(stringToDecimal(item.amount));
-			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
-			totalPayment += parseFloat(stringToDecimal(item?.totalPayment || 0));
-			totalBalance +=
-				parseFloat(stringToDecimal(item.amount)) -
-				(parseFloat(stringToDecimal(item.downpayment)) +
-					parseFloat(stringToDecimal(item.totalPayment || 0)));
+			totalExpenses += parseFloat(stringToDecimal(item.totalAmount));
 
 			return {
 				...item,
-				customer: item.customer.fullName || item.customer,
-				address: item?.customer?.address || item.address || '',
-				company: item?.customer?.company || item.company || '',
-				description: item.cart.map((cart: any) => {
-					return ` [${cart.name}, ${cart.price} x ${cart.quantity} = ${cart.subtotal || 0.0}]`;
+				items: item.cart.map((cart: any) => {
+					return ` [${cart.name}, ${formatCurrency(cart.amount)}, ${cart.paymentMethod}]`;
 				}),
-				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
-				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
-				totalPayment: formatCurrencyNoSymbol(parseFloat(item.totalPayment)),
-				balance: formatCurrencyNoSymbol(stringToDecimal(item.balance)),
+				totalAmount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item?.totalAmount || 0))),
 				createdAt: dateToString(item.createdAt)
 			};
 		});
 	};
 
 	onMount(() => {
-		sourceData = salesData(sourceData);
+		sourceData = expensesData(sourceData);
 		updateTable(sourceData);
-		businesses = [...new Set(sales.map((item: any) => item.business))];
+		businesses = [...new Set(expenses.map((item: any) => item.business))];
 	});
 
 	const downloadCsv = () => {
 		let csvContent = 'data:text/csv;charset=utf-8';
 
-		csvContent += ',Date,Business,Customer,Company,OR No,Description,Amount,DP,Payment,Balance,MOD\n';
+		csvContent += ',Date,Business,Name,Invoice,Description,Items,Amount\n';
 
 		if (filteredData.length > 0) {
 			filteredData.forEach((item: any) => {
@@ -216,15 +176,11 @@
 				const row = [
 					item.createdAt,
 					item.business,
-					item.customer,
-					item.company,
-					item.receipt,
-					`"${item.description}"`,
-					`"${item.amount}"`,
-					`"${item.downpayment}"`,
-					`"${item.totalPayment}"`,
-					`"${item.balance}"`,
-					item.paymentMethod
+					item.name,
+					item.invoice,
+					item.description,
+					`"${item.items}"`,
+					`"${item.totalAmount}"`
 				];
 
 				csvContent += row.join(',') + '\n';
@@ -252,25 +208,15 @@
 
 		const summary = [
 			'\n',
-			'Estimated Income',
-			`"${formatCurrencyNoSymbol(totalSales)}"`,
-			'BALANCE',
-			`"${formatCurrencyNoSymbol(totalBalance)}"\n`,
-			'Downpayment',
-			`"${formatCurrencyNoSymbol(totalDownpayment)}"\n`,
-			'Payment',
-			`"${formatCurrencyNoSymbol(totalPayment)}"\n`,
-			'Income',
-			`"${formatCurrencyNoSymbol(
-				stringToDecimal(totalDownpayment) + stringToDecimal(totalPayment)
-			)}"\n`
+			'Total Expenses',
+			`"${formatCurrencyNoSymbol(totalExpenses)}"`
 		];
 		csvContent += summary.join(',') + '\n';
 
 		const encodedUri = encodeURI(csvContent);
 		const link = document.createElement('a');
 		link.setAttribute('href', encodedUri);
-		link.setAttribute('download', 'sales.csv');
+		link.setAttribute('download', 'expenses.csv');
 		document.body.appendChild(link);
 		link.click();
 	};

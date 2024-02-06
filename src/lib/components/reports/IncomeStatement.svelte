@@ -4,11 +4,9 @@
 	import type { PaginationSettings, TableSource } from '@skeletonlabs/skeleton';
 	import { Download } from '$lib/components/icons/index';
 	import {
-		formatCurrency,
 		formatCurrencyNoSymbol,
 		stringToDecimal
 	} from '$lib/utils/currencyHelper';
-	import dateToString from '$lib/utils/dateHelper';
 	export let salesSummary: any[];
 	export let expensesSummary: any[];
 
@@ -64,16 +62,16 @@
 		updateTable(filteredData);
 	};
 
-	const filterByBusiness = (business: string) => {
-		sourceData = incomeData(sourceData);
-		paginationSettings.page = 0;
-		let tempData = sourceData;
-		if (business === '') return updateTable(sourceData);
-		let filteredData = tempData.filter((item: any) => {
-			return item.business === business;
-		});
-		updateTable(filteredData);
-	};
+	// const filterByBusiness = (business: string) => {
+	// 	sourceData = incomeData(sourceData);
+	// 	paginationSettings.page = 0;
+	// 	let tempData = sourceData;
+	// 	if (business === '') return updateTable(sourceData);
+	// 	let filteredData = tempData.filter((item: any) => {
+	// 		return item.business === business;
+	// 	});
+	// 	updateTable(filteredData);
+	// };
 
 	const updateTable = (sourceData: any) => {
 		sourceData = incomeData(sourceData);
