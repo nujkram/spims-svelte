@@ -18,6 +18,7 @@
 	} from '$lib/utils/currencyHelper';
 	import dateToString from '$lib/utils/dateHelper';
 
+	let isReady: Boolean = false;
 	let keyword: string = '';
 	let startDate: string = '';
 	let endDate: string = '';
@@ -199,6 +200,7 @@
 
 	onMount(async () => {
 		await loadData();
+		isReady = true;
 	});
 
 	// table row select handler
@@ -248,45 +250,54 @@
 	<header class="card-header">
 		<h1 class="h3">Sales Order</h1>
 	</header>
-	<section class="flex p-4 w-full gap-4">
-		<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
-			>Add <br />Sales Order</button
-		>
-		<label class="label flex-auto">
-			<span>Search</span>
-			<input
-				class="input"
-				type="text"
-				placeholder="Search by customer, company, or address"
-				name="keyword"
-				bind:value={keyword}
-				on:input={() => filterTable(keyword)}
-			/>
-		</label>
-		<!-- start date field and end date field -->
-		<div class="flex gap-4">
-			<label class="label">
-				<span>Start Date</span>
+	{#if !isReady}
+		<section class="flex p-4 w-full gap-12 items-center">
+			<div class="placeholder-circle animate-pulse w-32 h-16" />
+			<div class="placeholder animate-pulse w-96" />
+			<div class="placeholder animate-pulse w-52" />
+			<div class="placeholder animate-pulse w-52" />
+		</section>
+	{:else}
+		<section class="flex p-4 w-full gap-4">
+			<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
+				>Add <br />Sales Order</button
+			>
+			<label class="label flex-auto">
+				<span>Search</span>
 				<input
 					class="input"
-					type="date"
-					name="startDate"
-					bind:value={startDate}
-					on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
+					type="text"
+					placeholder="Search by customer, company, or address"
+					name="keyword"
+					bind:value={keyword}
+					on:input={() => filterTable(keyword)}
 				/>
 			</label>
-			<label class="label">
-				<span>End Date</span>
-				<input
-					class="input"
-					type="date"
-					name="endDate"
-					bind:value={endDate}
-					on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
-				/>
-			</label>
-		</div>
-	</section>
+			<!-- start date field and end date field -->
+			<div class="flex gap-4">
+				<label class="label">
+					<span>Start Date</span>
+					<input
+						class="input"
+						type="date"
+						name="startDate"
+						bind:value={startDate}
+						on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
+					/>
+				</label>
+				<label class="label">
+					<span>End Date</span>
+					<input
+						class="input"
+						type="date"
+						name="endDate"
+						bind:value={endDate}
+						on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
+					/>
+				</label>
+			</div>
+		</section>
+	{/if}
 </div>
 
 {#key sourceData}

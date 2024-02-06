@@ -11,6 +11,7 @@
 	import type { DrawerSettings, PaginationSettings, TableSource } from '@skeletonlabs/skeleton';
 	import { goto } from '$app/navigation';
 
+	let isReady: Boolean = false;
 	let keyword: string = '';
 	let sourceData: any = [];
 	let table: TableSource = {
@@ -111,6 +112,7 @@
 
 	onMount(async () => {
 		await loadData();
+		isReady = true;
 	});
 
 	// table row select handler
@@ -125,12 +127,19 @@
 	<header class="card-header">
 		<h1 class="h3">Users</h1>
 	</header>
+	{#if !isReady}
+		<section class="flex p-4 w-full gap-12 items-center">
+			<div class="placeholder-circle animate-pulse w-32 h-10" />
+			<div class="placeholder animate-pulse w-full" />
+		</section>
+	{:else}
 	<section class="flex p-4 w-full gap-4">
 		<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
 			>Add User</button
 		>
 		<input class="input ml-auto" type="text" placeholder="Search" bind:value={keyword} />
 	</section>
+	{/if}
 </div>
 
 {#key sourceData}
