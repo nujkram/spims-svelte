@@ -3,6 +3,7 @@
 	import { Box, Cart, CashStack, FileBarGraph, Home, People, Tag, Wallet } from '$lib/components/icons/index';
 	import Report from '$lib/components/reports/Report.svelte';
 	import IncomeStatement from '$lib/components/reports/IncomeStatement.svelte';
+	import Expenses from '$lib/components/reports/Expenses.svelte';
 
 	export let data;
 
@@ -45,11 +46,11 @@
 
 		<svelte:fragment slot="panel">
 			{#if tabSet === 0}
-				<Report {sales} {expenses} />
+				<Report {sales} />
 			{:else if tabSet === 1}
-				<IncomeStatement {incomeStatement} {salesSummary} {expensesSummary} />
+				<IncomeStatement {salesSummary} {expensesSummary} />
 			{:else if tabSet === 2}
-				<div class="p-4">Coming soon...</div>
+				<Expenses {expenses} />
 			{/if}
 		</svelte:fragment>
 	</TabGroup>
