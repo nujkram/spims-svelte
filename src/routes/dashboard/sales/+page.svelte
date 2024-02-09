@@ -17,6 +17,7 @@
 		stringToDecimal
 	} from '$lib/utils/currencyHelper';
 	import dateToString from '$lib/utils/dateHelper';
+	import Payment from '$lib/components/forms/sales/Payment.svelte';
 
 	let isReady: Boolean = false;
 	let keyword: string = '';
@@ -37,28 +38,26 @@
 			'Date',
 			'Business',
 			'Customer',
-			'Company',
-			'OR No',
 			'Description',
 			'Amount',
 			'DP',
 			'Payment',
 			'Balance',
-			'MOD'
+			'MOD',
+			'Status'
 		],
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, [
 			'createdAt',
 			'business',
 			'customer',
-			'company',
-			'receipt',
 			'description',
 			'amount',
 			'downpayment',
 			'totalPayment',
 			'balance',
-			'paymentMethod'
+			'paymentMethod',
+			'status'
 		])
 	};
 
@@ -135,27 +134,25 @@
 			'createdAt',
 			'business',
 			'customer',
-			'company',
-			'receipt',
 			'description',
 			'amount',
 			'downpayment',
 			'totalPayment',
 			'balance',
-			'paymentMethod'
+			'paymentMethod',
+			'status'
 		]);
 		table.meta = tableMapperValues(paginatedData, [
 			'createdAt',
 			'business',
 			'_id',
-			'company',
-			'receipt',
 			'description',
 			'amount',
 			'downpayment',
 			'totalPayment',
 			'balance',
-			'paymentMethod'
+			'paymentMethod',
+			'status'
 		]);
 
 		if ($page.data.user.role == 'ADMINISTRATOR') {
@@ -166,14 +163,13 @@
 				)}</div>`,
 				'',
 				'',
-				'',
-				'',
 				`<div class="variant-filled-secondary px-2 rounded">${formatCurrency(totalSales)}</div>`,
 				`<div class="variant-filled-success px-2 rounded">${formatCurrency(
 					totalDownpayment
 				)}</div>`,
 				`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalPayment)}</div>`,
 				`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalBalance)}</div>`,
+				'',
 				`<code class="code">${sourceData.length}</code>`
 			];
 		}
@@ -222,6 +218,9 @@
 				(parseFloat(stringToDecimal(item.downpayment)) +
 					parseFloat(stringToDecimal(item.totalPayment || 0)));
 
+			let status = item.balance
+				? '<div class="variant-filled-primary text-center px-2 rounded">Add Payment</div>'
+				: '<div class="variant-filled-success text-center px-2 rounded">Paid</div>';
 			return {
 				...item,
 				customer:
@@ -237,7 +236,8 @@
 				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
 				totalPayment: formatCurrencyNoSymbol(parseFloat(item.totalPayment)),
 				balance: formatCurrencyNoSymbol(stringToDecimal(item.balance)),
-				createdAt: dateToString(item.createdAt)
+				createdAt: dateToString(item.createdAt),
+				status
 			};
 		});
 	};

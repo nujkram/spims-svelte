@@ -2,7 +2,10 @@ import clientPromise from '$lib/server/mongo';
 import dateToString from '$lib/utils/dateHelper';
 
 /** @type {import('./$types').RequestHandler} */
-export const load = async () => {
+export const load = async ({locals}: {locals: unknown}) => {
+
+    const { user }: any = locals;
+
     const db = await clientPromise();
     const Sales = db.collection('sales');
     const Customers = db.collection('customers');
@@ -146,6 +149,7 @@ export const load = async () => {
     ]).toArray();
 
     return {
+        user,
         sales,
         customers,
         expenses,
