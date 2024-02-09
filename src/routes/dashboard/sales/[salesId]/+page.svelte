@@ -11,10 +11,7 @@
 	import Update from '$lib/components/forms/sales/Update.svelte';
 	import Payment from '$lib/components/forms/sales/Payment.svelte';
 	import dateToString from '$lib/utils/dateHelper';
-	import {
-		formatCurrency,
-		stringToDecimal
-	} from '$lib/utils/currencyHelper.js';
+	import { formatCurrency, stringToDecimal } from '$lib/utils/currencyHelper.js';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	export let data;
@@ -26,12 +23,12 @@
 	let cartData: any = [];
 	let tableProducts: TableSource = {
 		head: ['Name', 'Price', 'Quantity', 'Subtotal'],
-		body: tableMapperValues(sales?.cart, ['name', 'price', 'quantity', 'subtotal']),
+		body: tableMapperValues(sales?.cart, ['name', 'price', 'quantity', 'subtotal'])
 	};
 
 	let tablePayments: TableSource = {
 		head: ['Date', 'MOD', 'Amount'],
-		body: tableMapperValues(sales?.payments || [], ['createdAt', 'paymentMethod', 'amount']),
+		body: tableMapperValues(sales?.payments || [], ['createdAt', 'paymentMethod', 'amount'])
 	};
 
 	const toastStore = getToastStore();
@@ -128,10 +125,21 @@
 		await loadData();
 	});
 </script>
+
 <div class="card p-4">
-	<header class="card-header flex items-center gap-4">
-		<Avatar initials={fullNameInitial} background="bg-primary-500" fontSize={250} width="w-28" />
-		<h1 class="h1">{sales?.customer?.fullName || 'NA'}</h1>
+	<header class="card-header flex items-center justify-between gap-4">
+		<div class="flex gap-4 items-center">
+			<Avatar initials={fullNameInitial} background="bg-primary-500" fontSize={250} width="w-28" />
+			<h1 class="h1">{sales?.customer?.fullName || 'NA'}</h1>
+		</div>
+		<div>
+			<div class="btn-group variant-filled overflow-auto">
+				<button type="button" on:click={() => drawerStore.open(drawerPayment)}>Add Payment</button>
+				<button type="button" on:click={() => drawerStore.open(drawerUpdate)}>Edit</button>
+				<button type="button" on:click={() => toastStore.trigger(confirmSettings)}>Delete</button>
+				<button type="button" on:click={() => window.history.back()}>Close</button>
+			</div>
+		</div>
 	</header>
 	<section class="p-4 flex flex-col md:flex-row gap-4">
 		<div class="flex flex-col w-full gap-4 border-r-0 md:border-r">
@@ -189,14 +197,6 @@
 			</div>
 		</div>
 	</section>
-	<footer class="card-footer flex justify-end border-t-2 p-4">
-		<div class="btn-group variant-filled overflow-auto">
-			<button type="button" on:click={() => drawerStore.open(drawerPayment)}>Add Payment</button>
-			<button type="button" on:click={() => drawerStore.open(drawerUpdate)}>Edit</button>
-			<button type="button" on:click={() => toastStore.trigger(confirmSettings)}>Delete</button>
-			<button type="button" on:click={() => window.history.back()}>Close</button>
-		</div>
-	</footer>
 </div>
 
 <Drawer>
