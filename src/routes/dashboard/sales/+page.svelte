@@ -31,6 +31,7 @@
 	let totalDownpayment: number = 0;
 	let totalPayment: number = 0;
 	let totalBalance: number = 0;
+	let payments: number = 0;
 
 	let table: TableSource = {
 		// A list of heading labels.
@@ -54,7 +55,7 @@
 			'description',
 			'amount',
 			'downpayment',
-			'totalPayment',
+			'payment',
 			'balance',
 			'paymentMethod',
 			'status'
@@ -137,7 +138,7 @@
 			'description',
 			'amount',
 			'downpayment',
-			'totalPayment',
+			'payment',
 			'balance',
 			'paymentMethod',
 			'status'
@@ -149,7 +150,7 @@
 			'description',
 			'amount',
 			'downpayment',
-			'totalPayment',
+			'payment',
 			'balance',
 			'paymentMethod',
 			'status'
@@ -209,6 +210,8 @@
 		totalDownpayment = 0;
 		totalPayment = 0;
 		totalBalance = 0;
+		payments = 0;
+
 		return data.map((item: any) => {
 			totalSales += parseFloat(stringToDecimal(item.amount));
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
@@ -217,6 +220,13 @@
 				parseFloat(stringToDecimal(item.amount)) -
 				(parseFloat(stringToDecimal(item.downpayment)) +
 					parseFloat(stringToDecimal(item.totalPayment || 0)));
+
+			if (item && item?.payments) {
+				payments = 0;
+				item.payments.forEach((payment: any) => {
+					payments += parseFloat(stringToDecimal(payment.amount));
+				});
+			}
 
 			let status = item.balance
 				? '<div class="variant-filled-primary text-center px-2 rounded">Add Payment</div>'
@@ -235,6 +245,7 @@
 				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
 				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
 				totalPayment: formatCurrencyNoSymbol(parseFloat(item.totalPayment)),
+				payment: formatCurrencyNoSymbol(payments),
 				balance: formatCurrencyNoSymbol(stringToDecimal(item.balance)),
 				createdAt: dateToString(item.createdAt),
 				status

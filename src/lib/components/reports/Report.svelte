@@ -21,6 +21,7 @@
 	let totalDownpayment: number = 0;
 	let totalPayment: number = 0;
 	let totalBalance: number = 0;
+	let payments: number = 0;
 	let businesses: any[] = [];
 	let filteredData: any = [];
 
@@ -49,7 +50,7 @@
 			'description',
 			'amount',
 			'downpayment',
-			'totalPayment',
+			'payment',
 			'balance',
 			'paymentMethod'
 		])
@@ -75,11 +76,10 @@
 
 	// filter sourceData createdAt by date between start and end
 	const filterByDate = (start: Date, end: Date) => {
-		sourceData = salesData(sourceData);
 		paginationSettings.page = 0;
-		let tempData = sourceData;
+		let tempData = salesData(sourceData);
 		business = '';
-		filteredData = tempData.filter((item: any) => {
+		let filteredData = tempData.filter((item: any) => {
 			return new Date(item.createdAt) >= start && new Date(item.createdAt) <= end;
 		});
 		updateTable(filteredData);
@@ -115,7 +115,7 @@
 			'description',
 			'amount',
 			'downpayment',
-			'totalPayment',
+			'payment',
 			'balance',
 			'paymentMethod'
 		]);
@@ -128,7 +128,7 @@
 			'description',
 			'amount',
 			'downpayment',
-			'totalPayment',
+			'payment',
 			'balance',
 			'paymentMethod'
 		]);
@@ -173,6 +173,8 @@
 		totalDownpayment = 0;
 		totalPayment = 0;
 		totalBalance = 0;
+		payments = 0;
+
 		return data.map((item: any) => {
 			totalSales += parseFloat(stringToDecimal(item.amount));
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
@@ -181,6 +183,13 @@
 				parseFloat(stringToDecimal(item.amount)) -
 				(parseFloat(stringToDecimal(item.downpayment)) +
 					parseFloat(stringToDecimal(item.totalPayment || 0)));
+
+			if (item && item?.payments) {
+				payments = 0;
+				item.payments.forEach((payment: any) => {
+					payments += parseFloat(stringToDecimal(payment.amount));
+				});
+			}
 
 			return {
 				...item,
@@ -192,7 +201,8 @@
 				}),
 				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
 				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
-				totalPayment: formatCurrencyNoSymbol(parseFloat(item.totalPayment)),
+				totalPayment: item.totalPayment,
+				payment: formatCurrencyNoSymbol(payments),
 				balance: formatCurrencyNoSymbol(stringToDecimal(item.balance)),
 				createdAt: dateToString(item.createdAt)
 			};
@@ -208,7 +218,8 @@
 	const downloadCsv = () => {
 		let csvContent = 'data:text/csv;charset=utf-8';
 
-		csvContent += ',Date,Business,Customer,Company,OR No,Description,Amount,DP,Payment,Balance,MOD\n';
+		csvContent +=
+			',Date,Business,Customer,Company,OR No,Description,Amount,DP,Payment,Balance,MOD\n';
 
 		if (filteredData.length > 0) {
 			filteredData.forEach((item: any) => {
