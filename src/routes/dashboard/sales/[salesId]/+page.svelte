@@ -10,8 +10,9 @@
 	import type { DrawerSettings, TableSource, ToastSettings } from '@skeletonlabs/skeleton';
 	import Update from '$lib/components/forms/sales/Update.svelte';
 	import Payment from '$lib/components/forms/sales/Payment.svelte';
+	import UpdatePayment from '$lib/components/forms/sales/UpdatePayment.svelte';
 	import dateToString from '$lib/utils/dateHelper';
-	import { formatCurrency, stringToDecimal } from '$lib/utils/currencyHelper.js';
+	import { formatCurrency } from '$lib/utils/currencyHelper.js';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	export let data;
@@ -25,10 +26,19 @@
 		head: ['Name', 'Price', 'Quantity', 'Subtotal'],
 		body: tableMapperValues(sales?.cart, ['name', 'price', 'quantity', 'subtotal'])
 	};
+	let isReady: Boolean = false;
+	let paymentIndex: number;
+	let amount: number;
+	let paymentMethod: string = 'Cash';
 
 	let tablePayments: TableSource = {
-		head: ['Date', 'MOD', 'Amount'],
-		body: tableMapperValues(sales?.payments || [], ['createdAt', 'paymentMethod', 'amount'])
+		head: ['Date', 'MOD', 'Amount', 'Actions'],
+		body: tableMapperValues(sales?.payments || [], [
+			'createdAt',
+			'paymentMethod',
+			'amount',
+			'updateButton'
+		])
 	};
 
 	const toastStore = getToastStore();
@@ -70,6 +80,17 @@
 		position: 'right'
 	};
 
+	const drawerUpdatePayment: DrawerSettings = {
+		id: 'updatePayment',
+		// Provide your property overrides:
+		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
+		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
+		width: 'w-[280px] md:w-[480px]',
+		padding: 'p-4',
+		rounded: 'rounded-xl',
+		position: 'right'
+	};
+
 	const drawerStore = getDrawerStore();
 	drawerStore.close();
 
@@ -81,6 +102,7 @@
 
 	async function loadData() {
 		try {
+			isReady = false;
 			let response = await fetch('/api/admin/sales', {
 				method: 'GET',
 				headers: {
@@ -93,10 +115,56 @@
 			customerData = result.response.customers;
 			productData = result.response.products;
 			cartData = sourceData?.cart;
+
+			// set update button for each payment
+			if (sales?.payments) {
+				sales.payments.forEach((item: any, i) => {
+					const updateButton = createButton('button', 'Update', i);
+					item.updateButton = updateButton;
+				});
+				updateEventListener();
+				tablePayments.body = tableMapperValues(sales?.payments || [], [
+					'createdAt',
+					'paymentMethod',
+					'amount',
+					'updateButton'
+				]);
+			}
+
+			isReady = true;
 		} catch (error) {
 			console.error(error);
 		}
 	}
+
+	const createButton = (
+		type: 'button' | 'submit' | 'reset',
+		textContent: string,
+		index: number
+	) => {
+		const button = document.createElement('button');
+		button.type = type;
+		button.id = 'updateButtons';
+		button.dataset.index = index.toString();
+		button.textContent = textContent;
+		button.classList.add('btn', 'variant-filled');
+
+		return button.outerHTML;
+	};
+
+	const updateEventListener = () => {
+		setTimeout(() => {
+			const updateButtons = document.querySelectorAll('[id="updateButtons"]');
+			updateButtons.forEach((input) => {
+				input.addEventListener('click', (event) => {
+					paymentIndex = event?.target?.dataset?.index;
+					amount = sales.payments[paymentIndex].amount;
+					paymentMethod = sales.payments[paymentIndex].paymentMethod;
+					drawerStore.open(drawerUpdatePayment);
+				});
+			});
+		}, 1000);
+	};
 
 	const handleDelete = async () => {
 		try {
@@ -173,28 +241,82 @@
 				<h2 class="h2 mb-4 w-full">Cart</h2>
 				<Table source={tableProducts} />
 			</div>
-			<div class="flex flex-col w-full px-3">
-				<div class="flex justify-between">
-					<p>Total</p>
-					<p>{formatCurrency(sales?.amount) || 0.0}</p>
-				</div>
-				<div class="flex justify-between">
-					<p>Downpayment</p>
-					<p>{formatCurrency(sales?.downpayment) || 0.0}</p>
-				</div>
-				<div class="flex justify-between">
-					<p>Payment</p>
-					<p>{formatCurrency(sales?.totalPayment) || 0.0}</p>
-				</div>
-				<div class="flex justify-between">
-					<p>Balance</p>
-					<p>{formatCurrency(sales?.balance) || 0.0}</p>
-				</div>
-			</div>
-			<div class="flex flex-col w-full">
-				<h2 class="h2 mb-4 w-full">Payments</h2>
-				<Table source={tablePayments} />
-			</div>
+			{#key isReady}
+				{#if isReady}
+					<div class="flex flex-col w-full px-3">
+						<div class="flex justify-between">
+							<p>Total</p>
+							<p>{formatCurrency(sales?.amount) || 0.0}</p>
+						</div>
+						<div class="flex justify-between">
+							<p>Downpayment</p>
+							<p>{formatCurrency(sales?.downpayment) || 0.0}</p>
+						</div>
+						<div class="flex justify-between">
+							<p>Payment</p>
+							<p>{formatCurrency(sales?.totalPayment) || 0.0}</p>
+						</div>
+						<div class="flex justify-between">
+							<p>Balance</p>
+							<p>{formatCurrency(sales?.balance) || 0.0}</p>
+						</div>
+					</div>
+					<div class="flex flex-col w-full">
+						<h2 class="h2 mb-4 w-full">Payments</h2>
+
+						<Table source={tablePayments} />
+					</div>
+				{:else}
+					<div class="flex flex-col w-full px-3">
+						<div class="flex justify-between">
+							<p>Total</p>
+							<p class="placeholder w-52 animate-pulse"></p>
+						</div>
+						<div class="flex justify-between">
+							<p>Downpayment</p>
+							<p class="placeholder w-52 animate-pulse"></p>
+						</div>
+						<div class="flex justify-between">
+							<p>Payment</p>
+							<p class="placeholder w-52 animate-pulse"></p>
+						</div>
+						<div class="flex justify-between">
+							<p>Balance</p>
+							<p class="placeholder w-52 animate-pulse"></p>
+						</div>
+					</div>
+					<div class="flex flex-col w-full">
+						<h2 class="h2 mb-4 w-full">Payments</h2>
+
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>MOD</th>
+									<th>Amount</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr>
+									<td><div class="placeholder w-18 animate-pulse"></div></td>
+									<td><div class="placeholder w-18 animate-pulse"></div></td>
+									<td><div class="placeholder w-18 animate-pulse"></div></td>
+									<td><div class="placeholder w-18 animate-pulse"></div></td>
+								</tr>
+								<tr>
+									<td><div class="placeholder w-18 animate-pulse"></div></td>
+									<td><div class="placeholder w-18 animate-pulse"></div></td>
+									<td><div class="placeholder w-18 animate-pulse"></div></td>
+									<td><div class="placeholder w-18 animate-pulse"></div></td>
+								</tr>
+								<!-- Add more rows as needed -->
+							</tbody>
+						</table>
+					</div>
+				{/if}
+			{/key}
 		</div>
 	</section>
 </div>
@@ -212,5 +334,15 @@
 		/>
 	{:else if $drawerStore.id === 'paymentSalesOrder'}
 		<Payment id={sales?._id} {drawerStore} />
+	{:else if $drawerStore.id === 'updatePayment'}
+		<UpdatePayment
+			id={sales?._id}
+			index={paymentIndex}
+			{amount}
+			{paymentMethod}
+			{drawerStore}
+			createdAt={sales?.payments[paymentIndex]?.createdAt}
+			createdBy={sales?.payments[paymentIndex]?.createdBy}
+		/>
 	{/if}
 </Drawer>
