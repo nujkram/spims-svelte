@@ -221,7 +221,6 @@
 				(parseFloat(stringToDecimal(item.downpayment)) +
 					parseFloat(stringToDecimal(item.totalPayment || 0)));
 
-			console.log(item._id, item.customer, item.payments);
 			payments = 0;
 			if (item && item?.payments) {
 				item.payments.forEach((payment: any) => {

@@ -41,6 +41,7 @@
 			toastSettings.message = result.message;
 			toastStore.trigger(toastSettings);
 			drawerStore.close();
+			window.location.reload();
 		} catch (error) {
 			toastSettings.message = error.message;
 			toastSettings.background = 'bg-red-500';
