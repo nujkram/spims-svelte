@@ -47,7 +47,7 @@
 		timeout: 5000
 	};
 
-	const confirmSettings: ToastSettings = {
+	const confirmDeletionSettings: ToastSettings = {
 		message: 'This action is irreversible. Are you sure you want to delete this record?',
 		background: 'bg-yellow-600',
 		action: {
@@ -56,6 +56,18 @@
 		},
 		timeout: 8000
 	};
+
+	const confirmPaymentDeletionSettings: ToastSettings = {
+		message: 'This action is irreversible. Are you sure you want to delete this record?',
+		background: 'bg-yellow-600',
+		action: {
+			label: 'Yes',
+			response: () => handlePaymentDelete(paymentIndex)
+		},
+		timeout: 8000
+	};
+
+
 
 	// drawer settings
 	const drawerUpdate: DrawerSettings = {
@@ -119,15 +131,26 @@
 			// set update button for each payment
 			if (sales?.payments) {
 				sales.payments.forEach((item: any, i) => {
-					const updateButton = createButton('button', 'Update', i);
+					const updateButton = createButton('button', 'Update', i, 'updateButtons');
+					const deleteButton = createButton('button', 'Delete', i, 'deleteButtons');
 					item.updateButton = updateButton;
+					item.deleteButton = deleteButton;
 				});
 				updateEventListener();
+				deletePaymentEventListener();
+				sales?.payments.map((item: any) => {
+					item.actions = `
+					<div class="btn-group variant-filled overflow-auto">
+						${item.updateButton}
+						${item.deleteButton}
+					</div>
+					`;
+				});
 				tablePayments.body = tableMapperValues(sales?.payments || [], [
 					'createdAt',
 					'paymentMethod',
 					'amount',
-					'updateButton'
+					'actions'
 				]);
 			}
 
@@ -140,14 +163,14 @@
 	const createButton = (
 		type: 'button' | 'submit' | 'reset',
 		textContent: string,
-		index: number
+		index: number,
+		id: string,
 	) => {
 		const button = document.createElement('button');
 		button.type = type;
-		button.id = 'updateButtons';
+		button.id = id;
 		button.dataset.index = index.toString();
 		button.textContent = textContent;
-		button.classList.add('btn', 'variant-filled');
 
 		return button.outerHTML;
 	};
@@ -161,6 +184,18 @@
 					amount = sales.payments[paymentIndex].amount;
 					paymentMethod = sales.payments[paymentIndex].paymentMethod;
 					drawerStore.open(drawerUpdatePayment);
+				});
+			});
+		}, 1000);
+	};
+
+	const deletePaymentEventListener = () => {
+		setTimeout(() => {
+			const deleteButtons = document.querySelectorAll('[id="deleteButtons"]');
+			deleteButtons.forEach((input) => {
+				input.addEventListener('click', (event) => {
+					paymentIndex = event?.target?.dataset?.index;
+					toastStore.trigger(confirmPaymentDeletionSettings)
 				});
 			});
 		}, 1000);
@@ -189,6 +224,31 @@
 		}
 	};
 
+	const handlePaymentDelete = async (paymentIndex: number) => {
+		try {
+			let response = await fetch('/api/admin/sales/payment/delete', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ _id: sales?._id, paymentIndex })
+			});
+
+			let result = await response.json();
+
+			toastSettings.message = result.message;
+			toastStore.trigger(toastSettings);
+			window.location.reload();
+		} catch (error) {
+			toastSettings.message = error.message;
+			toastSettings.background = 'bg-red-500';
+			toastStore.trigger(toastSettings);
+			console.error(error);
+		}
+	};
+
+	
+
 	onMount(async () => {
 		await loadData();
 	});
@@ -204,7 +264,7 @@
 			<div class="btn-group variant-filled overflow-auto">
 				<button type="button" on:click={() => drawerStore.open(drawerPayment)}>Add Payment</button>
 				<button type="button" on:click={() => drawerStore.open(drawerUpdate)}>Edit</button>
-				<button type="button" on:click={() => toastStore.trigger(confirmSettings)}>Delete</button>
+				<button type="button" on:click={() => toastStore.trigger(confirmDeletionSettings)}>Delete</button>
 				<button type="button" on:click={() => window.history.back()}>Close</button>
 			</div>
 		</div>
