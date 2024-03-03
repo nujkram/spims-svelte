@@ -10,6 +10,7 @@
 	let isFocused: boolean = true;
 	let category: string = '';
 	let categoryOptions: any;
+	let business: string = 'RAC';
 
 	const toastStore = getToastStore();
 	const toastSettings: ToastSettings = {
@@ -49,7 +50,8 @@
 					name,
 					price,
 					status,
-					category
+					category,
+					business
 				})
 			});
 
@@ -68,6 +70,13 @@
 	}}
 >
 	<h2 class="h4">Create Product</h2>
+	<label class="label">
+		<span>Business</span>
+		<select class="select" bind:value={business}>
+			<option value="RAC">RAC</option>
+			<option value="DTF">DTF</option>
+		</select>
+	</label>
 	<label class="label mt-4">
 		<span>Name</span>
 		<input

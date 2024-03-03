@@ -68,6 +68,17 @@ export const load = async () => {
     ]
 
     const sales = await Sales.aggregate(pipeline).toArray();
+    
+    for (const sale of sales) {
+        for (const item of sale.cart) {
+            const product = await Products.findOne({ _id: item.id });
+            if (product) {
+                item.business = product.business;
+            }
+        }
+    }
+
+    
 
     // Add totalPayment to sales
     sales.map((item) => {

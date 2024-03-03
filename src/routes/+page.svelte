@@ -50,14 +50,11 @@
 			page.subscribe((value) => {
 				value.data.user = {
 					_id: data.user._id,
-					profile: {
-						email: data.user.email,
-						firstName: data.user.firstName,
-						lastName: data.user.lastName,
-						phone: data.user.phone,
-						fullName: data.user.fullName
-					},
-					email: data.user.email
+					email: data.user.email,
+					firstName: data.user.firstName,
+					lastName: data.user.lastName,
+					role: data.user.role,
+					name: data.user.fullName
 				};
 			});
 

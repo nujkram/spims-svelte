@@ -17,9 +17,9 @@
 	let sourceData: any = [];
 	let table: TableSource = {
 		// A list of heading labels.
-		head: ['Name', 'Category', 'Price', 'Status'],
+		head: ['Name', 'Category', 'Business', 'Price', 'Status'],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['name', 'category', 'price', 'status'])
+		body: tableMapperValues(sourceData, ['name', 'category', 'business', 'price', 'status'])
 	};
 
 	async function loadData() {
@@ -78,8 +78,11 @@
 			paginationSettings.page * paginationSettings.limit,
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
-		table.body = tableMapperValues(paginatedData, ['name', 'category', 'price', 'status']);
-		table.meta = tableMapperValues(paginatedData, ['_id', 'category', 'price', 'status']);
+		paginatedData.map((item: any) => {
+			item.status = item.status ? 'Active' : 'Inactive';
+		})
+		table.body = tableMapperValues(paginatedData, ['name', 'category', 'business', 'price', 'status']);
+		table.meta = tableMapperValues(paginatedData, ['_id', 'category', 'business', 'price', 'status']);
 		table.foot = ['Total', '', '', `<code class="code">${sourceData.length}</code>`];
 	};
 

@@ -228,9 +228,10 @@
 				});
 			}
 
-			let status = item.balance
-				? '<div class="variant-filled-primary text-center px-2 rounded">Add Payment</div>'
+			let status = stringToDecimal(item.balance)
+				? '<div class="variant-filled-primary text-center px-2 rounded">Unpaid</div>'
 				: '<div class="variant-filled-success text-center px-2 rounded">Paid</div>';
+
 			return {
 				...item,
 				customer:
