@@ -94,7 +94,16 @@
 			return updateTable(sourceData);
 		}
 		filteredData = tempData.filter((item: any) => {
+			// Check if any item in the cart array has the same business value as the provided business variable
 			return item.business === business;
+		});
+
+		filteredData = filteredData.map((item) => {
+			const cart = item.cart.filter((cartItem) => cartItem.business === business);
+			return {
+				...item,
+				cart
+			};
 		});
 		updateTable(filteredData);
 	};
@@ -176,6 +185,10 @@
 		payments = 0;
 
 		return data.map((item: any) => {
+			item.amount = 0;
+			item.cart.forEach((cart: any) => {
+				item.amount += parseFloat(stringToDecimal(cart.subtotal));
+			});
 			totalSales += parseFloat(stringToDecimal(item.amount));
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
 			totalPayment += parseFloat(stringToDecimal(item?.totalPayment || 0));
@@ -190,6 +203,7 @@
 					payments += parseFloat(stringToDecimal(payment.amount));
 				});
 			}
+		
 
 			return {
 				...item,
