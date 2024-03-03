@@ -38,6 +38,10 @@
 		<h2 class="h2 italic">{product?.category || 'NA'}</h2>
 		<div class="flex flex-col md:flex-row w-full gap-4 justify-between mt-4">
 			<div class="flex flex-col items-center">
+				<h3 class="h3">Business</h3>
+				<p class="p">{product?.business ? product?.business : 'NA'}</p>
+			</div>
+			<div class="flex flex-col items-center">
 				<h3 class="h3">Created At</h3>
 				<p class="p">{product?.createdAt ? dateToString(product?.createdAt) : 'NA'}</p>
 			</div>

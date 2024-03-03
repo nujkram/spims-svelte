@@ -11,6 +11,7 @@
 	let isFocused: boolean = true;
 	let category: string = product?.category;
 	let categoryOptions: any;
+	let business: string = product?.business;
 
 	// toast settings
 	const toastStore = getToastStore();
@@ -51,7 +52,8 @@
 					name: product?.name,
 					price: product?.price,
 					category: category,
-					status: product?.status
+					status: product?.status,
+					business: product?.business
 				})
 			});
 
@@ -70,6 +72,13 @@
 	}}
 >
 	<h2 class="h4">Update User {product.name}</h2>
+	<label class="label">
+		<span>Business</span>
+		<select class="select" bind:value={product.business}>
+			<option value="RAC">RAC</option>
+			<option value="DTF">DTF</option>
+		</select>
+	</label>
 	<label class="label mt-4">
 		<span>Name</span>
 		<input

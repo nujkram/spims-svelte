@@ -18,6 +18,7 @@ export const POST = async ({ request, locals }: any) => {
             category: data.category,
             price: data.price,
             isActive: true,
+            business: data.business,
             updatedBy: locals.user._id
         }
     }
