@@ -84,13 +84,13 @@
 		customerId = event.detail.meta;
 	};
 
-	const uniqueProducts = new Set(productData.map((item: any) => [item.name, item._id, item.price]));
+	const uniqueProducts = new Set(productData.map((item: any) => [item.name, item._id, item.price, item.business]));
 
 	productOptions = [...uniqueProducts].map((product: any) => {
 		return {
 			label: product[0],
 			value: product[0],
-			meta: { id: product[1], price: product[2] },
+			meta: { id: product[1], price: product[2], business: product[3]},
 			keywords: product
 		};
 	});
@@ -105,6 +105,7 @@
 			name: selectedProduct[0],
 			price: selectedProduct[1].price,
 			subtotal: selectedProduct[1].price,
+			businss: selectedProduct[1].business,
 			quantity: 1
 		};
 		dict = value;
