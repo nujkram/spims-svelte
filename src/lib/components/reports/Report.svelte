@@ -42,7 +42,7 @@
 		],
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, [
-			'createdAt',
+			'date',
 			'business',
 			'customer',
 			'company',
@@ -75,36 +75,46 @@
 	};
 
 	// filter sourceData createdAt by date between start and end
-	const filterByDate = (start: Date, end: Date) => {
+	const filterData = (start: Date, end: Date) => {
 		paginationSettings.page = 0;
 		let tempData = salesData(sourceData);
-		business = '';
-		filteredData = tempData.filter((item: any) => {
-			return new Date(item.createdAt) >= start && new Date(item.createdAt) <= end;
-		});
-		updateTable(filteredData);
-	};
 
-	const filterByBusiness = (business: string) => {
-		sourceData = salesData(sourceData);
-		paginationSettings.page = 0;
-		let tempData = sourceData;
-		if (business === '') {
-			filteredData = [];
-			return updateTable(sourceData);
+		if (business === '' && startDate !== '' && endDate !== '') {
+			filteredData = tempData.filter((item: any) => {
+				return (
+					new Date(item.createdAt) >= new Date(startDate) &&
+					new Date(item.createdAt) <= new Date(endDate)
+				);
+			});
+		} else if (business !== '' && startDate !== '' && endDate !== '') {
+			filteredData = tempData.filter((item: any) => {
+				return (
+					new Date(item.createdAt) >= new Date(startDate) &&
+					new Date(item.createdAt) <= new Date(endDate) &&
+					item.business === business
+				);
+			});
+			filteredData.map((item) => {
+				const cart = item.cart.filter((cartItem) => cartItem.business === business);
+				return {
+					...item,
+					cart
+				};
+			});
+		} else if (business === '' && startDate === '' && endDate === '') {
+			filteredData = tempData;
+		} else {
+			filteredData = sourceData.filter((item: any) => {
+				return item.business === business;
+			});
+			filteredData.map((item) => {
+				const cart = item.cart.filter((cartItem) => cartItem.business === business);
+				return {
+					...item,
+					cart
+				};
+			});
 		}
-		filteredData = tempData.filter((item: any) => {
-			// Check if any item in the cart array has the same business value as the provided business variable
-			return item.business === business;
-		});
-
-		filteredData = filteredData.map((item) => {
-			const cart = item.cart.filter((cartItem) => cartItem.business === business);
-			return {
-				...item,
-				cart
-			};
-		});
 		updateTable(filteredData);
 	};
 
@@ -116,7 +126,7 @@
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
 		table.body = tableMapperValues(paginatedData, [
-			'createdAt',
+			'date',
 			'business',
 			'customer',
 			'company',
@@ -129,7 +139,7 @@
 			'paymentMethod'
 		]);
 		table.meta = tableMapperValues(paginatedData, [
-			'createdAt',
+			'date',
 			'business',
 			'customer',
 			'company',
@@ -168,12 +178,18 @@
 	// pagination event handlers
 	const onAmountChange = (e: CustomEvent): void => {
 		paginationSettings.limit = e.detail;
-		updateTable(sourceData);
+		if(filteredData.length > 0)
+			updateTable(filteredData)
+		else
+			updateTable(sourceData);
 	};
 
 	// pagination event handlers
 	const onPageChange = (e: CustomEvent): void => {
 		paginationSettings.page = e.detail;
+		if(filteredData.length > 0)
+			updateTable(filteredData)
+		else
 		updateTable(sourceData);
 	};
 
@@ -203,7 +219,6 @@
 					payments += parseFloat(stringToDecimal(payment.amount));
 				});
 			}
-		
 
 			return {
 				...item,
@@ -218,7 +233,7 @@
 				totalPayment: item.totalPayment,
 				payment: formatCurrencyNoSymbol(payments),
 				balance: formatCurrencyNoSymbol(stringToDecimal(item.balance)),
-				createdAt: dateToString(item.createdAt)
+				date: dateToString(item.createdAt)
 			};
 		});
 	};
@@ -234,8 +249,8 @@
 
 		csvContent +=
 			',Date,Business,Customer,Company,OR No,Description,Amount,DP,Payment,Balance,MOD\n';
-		console.log(filteredData)
-		if (filteredData.length > 0) {
+
+			if (filteredData.length > 0) {
 			filteredData.forEach((item: any) => {
 				// Convert numbers to strings and enclose fields with commas in double quotes
 				const row = [
@@ -311,7 +326,7 @@
 					name="business"
 					bind:value={business}
 					on:click={() => {
-						filterByBusiness(business);
+						filterData(new Date(startDate), new Date(endDate));
 					}}
 				>
 					<option value="">All</option>
@@ -340,7 +355,7 @@
 						type="date"
 						name="startDate"
 						bind:value={startDate}
-						on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
+						on:change={() => filterData(new Date(startDate), new Date(endDate))}
 					/>
 				</label>
 				<label class="label">
@@ -350,7 +365,7 @@
 						type="date"
 						name="endDate"
 						bind:value={endDate}
-						on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
+						on:change={() => filterData(new Date(startDate), new Date(endDate))}
 					/>
 				</label>
 			</div>
@@ -362,7 +377,7 @@
 		</div>
 
 		{#key sourceData}
-			<Table source={table} interactive={true} />
+			<Table source={table} />
 			<Paginator
 				class="mt-4"
 				bind:settings={paginationSettings}
