@@ -55,7 +55,7 @@ export const load = async () => {
         item.balance = parseFloat(item.amount) - (parseFloat(item.downpayment) + parseFloat(item.totalPayment));
 
     })
-    console.log(sales);
+
     return {
         sales
     }
