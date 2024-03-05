@@ -33,36 +33,8 @@ export const load = async () => {
             },
         },
         {
-            $lookup: {
-                'from': 'users',
-                'localField': 'createdBy',
-                'foreignField': '_id',
-                'as': 'createdBy'
-            },
-        },
-        {
-            $lookup: {
-                'from': 'users',
-                'localField': 'updatedBy',
-                'foreignField': '_id',
-                'as': 'updatedBy'
-            },
-        },
-        {
             $unwind: {
                 path: '$customer',
-                preserveNullAndEmptyArrays: true
-            },
-        },
-        {
-            $unwind: {
-                path: '$createdBy',
-                preserveNullAndEmptyArrays: true
-            },
-        },
-        {
-            $unwind: {
-                path: '$updatedBy',
                 preserveNullAndEmptyArrays: true
             },
         },
@@ -72,15 +44,6 @@ export const load = async () => {
     ]
 
     const sales = await Sales.aggregate(pipeline).toArray();
-    
-    for (const sale of sales) {
-        for (const item of sale.cart) {
-            const product = await Products.findOne({ _id: item.id });
-            if (product) {
-                item.business = product.business;
-            }
-        }
-    }
 
     // Add totalPayment to sales
     sales.map((item) => {
@@ -92,7 +55,7 @@ export const load = async () => {
         item.balance = parseFloat(item.amount) - (parseFloat(item.downpayment) + parseFloat(item.totalPayment));
 
     })
-
+    console.log(sales);
     return {
         sales
     }
