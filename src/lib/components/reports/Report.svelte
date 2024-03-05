@@ -79,7 +79,7 @@
 		paginationSettings.page = 0;
 		let tempData = salesData(sourceData);
 		business = '';
-		let filteredData = tempData.filter((item: any) => {
+		filteredData = tempData.filter((item: any) => {
 			return new Date(item.createdAt) >= start && new Date(item.createdAt) <= end;
 		});
 		updateTable(filteredData);
@@ -234,22 +234,22 @@
 
 		csvContent +=
 			',Date,Business,Customer,Company,OR No,Description,Amount,DP,Payment,Balance,MOD\n';
-
+		console.log(filteredData)
 		if (filteredData.length > 0) {
 			filteredData.forEach((item: any) => {
 				// Convert numbers to strings and enclose fields with commas in double quotes
 				const row = [
-					item.createdAt,
-					item.business,
-					item.customer,
-					item.company,
-					item.receipt,
+					`"${item.createdAt}"`,
+					`"${item.business}"`,
+					`"${item.customer}"`,
+					`"${item.company}"`,
+					`"${item.receipt}"`,
 					`"${item.description}"`,
 					`"${item.amount}"`,
 					`"${item.downpayment}"`,
 					`"${item.totalPayment}"`,
 					`"${item.balance}"`,
-					item.paymentMethod
+					`"${item.paymentMethod}"`
 				];
 
 				csvContent += row.join(',') + '\n';
