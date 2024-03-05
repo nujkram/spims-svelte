@@ -14,10 +14,21 @@ export const load = async () => {
     const expenses = await Expenses.find({}).sort({ createdAt: 1 }).toArray();
     const users = await Users.find({}).sort({ createdAt: 1 }).toArray();
 
+    // get start and end of the previous month
+    const start = new Date();
+    start.setDate(1);
+    start.setMonth(start.getMonth() - 1);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
     const pipeline = [
         {
             $match: {
                 isActive: true,
+                createdAt: {
+                    $gte: start,
+                    $lt: end
+                }
             }
         },
         {
@@ -95,6 +106,10 @@ export const load = async () => {
         {
             $match: {
                 isActive: true,
+                createdAt: {
+                    $gte: start,
+                    $lt: end
+                }
             }
         },
         {
@@ -145,6 +160,10 @@ export const load = async () => {
         {
             $match: {
                 isActive: true,
+                createdAt: {
+                    $gte: start,
+                    $lt: end
+                }
             }
         },
         {
