@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { AppRail, AppRailAnchor } from '@skeletonlabs/skeleton';
-	import { Box, Cart, FileBarGraph, Home, People, Tag, Wallet } from '$lib/components/icons/index';
+	import { Box, Cart, CashStack, FileBarGraph, Home, People, Tag, Wallet } from '$lib/components/icons/index';
 	export let user: any;
 </script>
 
@@ -98,6 +98,30 @@
 				</div>
 			</svelte:fragment>
 			<span>Reports</span>
+		</AppRailAnchor>
+		<AppRailAnchor
+			title="Net Income"
+			href="/dashboard/reports/net-income"
+			selected={$page.url.pathname === '/dashboard/reports/net-income'}
+		>
+			<svelte:fragment slot="lead">
+				<div class="flex items-center justify-center">
+					<CashStack />
+				</div>
+			</svelte:fragment>
+			<span>Net Income</span>
+		</AppRailAnchor>
+		<AppRailAnchor
+			title="Expenses"
+			href="/dashboard/reports/expenses"
+			selected={$page.url.pathname === '/dashboard/reports/expenses'}
+		>
+			<svelte:fragment slot="lead">
+				<div class="flex items-center justify-center">
+					<Wallet />
+				</div>
+			</svelte:fragment>
+			<span>Expenses</span>
 		</AppRailAnchor>
 	{/if}
 </AppRail>
