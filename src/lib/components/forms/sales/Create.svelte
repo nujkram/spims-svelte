@@ -105,7 +105,7 @@
 			name: selectedProduct[0],
 			price: selectedProduct[1].price,
 			subtotal: selectedProduct[1].price,
-			businss: selectedProduct[1].business,
+			business: selectedProduct[1].business,
 			quantity: 1
 		};
 		dict = value;
