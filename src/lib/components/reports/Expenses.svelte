@@ -279,7 +279,7 @@
 						type="date"
 						name="startDate"
 						bind:value={startDate}
-						on:change={() => filterData(new Date(startDate), new Date(endDate));}
+						on:change={() => filterData(new Date(startDate), new Date(endDate))}
 					/>
 				</label>
 				<label class="label">
@@ -289,7 +289,7 @@
 						type="date"
 						name="endDate"
 						bind:value={endDate}
-						on:change={() => filterData(new Date(startDate), new Date(endDate));}
+						on:change={() => filterData(new Date(startDate), new Date(endDate))}
 					/>
 				</label>
 			</div>
