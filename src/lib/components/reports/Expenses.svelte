@@ -63,28 +63,46 @@
 	};
 
 	// filter sourceData createdAt by date between start and end
-	const filterByDate = (start: Date, end: Date) => {
-		sourceData = expensesData(sourceData);
+	const filterData = (start: Date, end: Date) => {
 		paginationSettings.page = 0;
-		let tempData = sourceData;
-		business = '';
-		filteredData = tempData.filter((item: any) => {
-			return new Date(item.createdAt) >= start && new Date(item.createdAt) <= end;
-		});
-		updateTable(filteredData);
-	};
+		let tempData = salesData(sourceData);
 
-	const filterByBusiness = (business: string) => {
-		sourceData = expensesData(sourceData);
-		paginationSettings.page = 0;
-		let tempData = sourceData;
-		if (business === '') {
-			filteredData = [];
-			return updateTable(sourceData);
+		if (business === '' && startDate !== '' && endDate !== '') {
+			filteredData = tempData.filter((item: any) => {
+				return (
+					new Date(item.createdAt) >= new Date(startDate) &&
+					new Date(item.createdAt) <= new Date(endDate)
+				);
+			});
+		} else if (business !== '' && startDate !== '' && endDate !== '') {
+			filteredData = tempData.filter((item: any) => {
+				return (
+					new Date(item.createdAt) >= new Date(startDate) &&
+					new Date(item.createdAt) <= new Date(endDate) &&
+					item.business === business
+				);
+			});
+			filteredData.map((item) => {
+				const cart = item.cart.filter((cartItem) => cartItem.business === business);
+				return {
+					...item,
+					cart
+				};
+			});
+		} else if (business === '' && startDate === '' && endDate === '') {
+			filteredData = tempData;
+		} else {
+			filteredData = sourceData.filter((item: any) => {
+				return item.business === business;
+			});
+			filteredData.map((item) => {
+				const cart = item.cart.filter((cartItem) => cartItem.business === business);
+				return {
+					...item,
+					cart
+				};
+			});
 		}
-		filteredData = tempData.filter((item: any) => {
-			return item.business === business;
-		});
 		updateTable(filteredData);
 	};
 
@@ -232,7 +250,7 @@
 					name="business"
 					bind:value={business}
 					on:click={() => {
-						filterByBusiness(business);
+						filterData(new Date(startDate), new Date(endDate));
 					}}
 				>
 					<option value="">All</option>
@@ -261,7 +279,7 @@
 						type="date"
 						name="startDate"
 						bind:value={startDate}
-						on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
+						on:change={() => filterData(new Date(startDate), new Date(endDate))}
 					/>
 				</label>
 				<label class="label">
@@ -271,7 +289,7 @@
 						type="date"
 						name="endDate"
 						bind:value={endDate}
-						on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
+						on:change={() => filterData(new Date(startDate), new Date(endDate))}
 					/>
 				</label>
 			</div>
