@@ -65,31 +65,28 @@
 	// filter sourceData createdAt by date between start and end
 	const filterData = (start: Date, end: Date) => {
 		paginationSettings.page = 0;
+		end.setHours(23, 59, 59);
 		let tempData = salesData(sourceData);
 
-		if (business === '' && startDate !== '' && endDate !== '') {
+		if (business === '' && start !== null && end !== null) {
 			filteredData = tempData.filter((item: any) => {
 				return (
-					new Date(item.createdAt) >= new Date(startDate) &&
-					new Date(item.createdAt) <= new Date(endDate)
+					new Date(item.createdAt) >= new Date(start) &&
+					new Date(item.createdAt) <= new Date(end)
 				);
 			});
-		} else if (business !== '' && startDate !== '' && endDate !== '') {
+		} else if (business !== '' && start !== null && end !== null) {
 			filteredData = tempData.filter((item: any) => {
 				return (
-					new Date(item.createdAt) >= new Date(startDate) &&
-					new Date(item.createdAt) <= new Date(endDate) &&
-					item.business === business
+					new Date(item.createdAt) >= new Date(start) &&
+					new Date(item.createdAt) <= new Date(end)
 				);
 			});
 			filteredData.map((item) => {
 				const cart = item.cart.filter((cartItem) => cartItem.business === business);
-				return {
-					...item,
-					cart
-				};
+				item.cart
 			});
-		} else if (business === '' && startDate === '' && endDate === '') {
+		} else if (business === '' && start === null && end === null) {
 			filteredData = tempData;
 		} else {
 			filteredData = sourceData.filter((item: any) => {
@@ -152,13 +149,15 @@
 	// pagination event handlers
 	const onAmountChange = (e: CustomEvent): void => {
 		paginationSettings.limit = e.detail;
-		updateTable(sourceData);
+		if (filteredData.length > 0) updateTable(filteredData);
+		else updateTable(sourceData);
 	};
 
 	// pagination event handlers
 	const onPageChange = (e: CustomEvent): void => {
 		paginationSettings.page = e.detail;
-		updateTable(sourceData);
+		if (filteredData.length > 0) updateTable(filteredData);
+		else updateTable(sourceData);
 	};
 
 	const expensesData = (data: any) => {
