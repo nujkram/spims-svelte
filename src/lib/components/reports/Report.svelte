@@ -77,31 +77,26 @@
 	// filter sourceData createdAt by date between start and end
 	const filterData = (start: Date, end: Date) => {
 		paginationSettings.page = 0;
+		end.setHours(23, 59, 59);
 		let tempData = salesData(sourceData);
 
-		if (business === '' && startDate !== '' && endDate !== '') {
+		if (business === '' && start !== null && end !== null) {
 			filteredData = tempData.filter((item: any) => {
 				return (
-					new Date(item.createdAt) >= new Date(startDate) &&
-					new Date(item.createdAt) <= new Date(endDate)
+					new Date(item.createdAt) >= new Date(start) && new Date(item.createdAt) <= new Date(end)
 				);
 			});
-		} else if (business !== '' && startDate !== '' && endDate !== '') {
+		} else if (business !== '' && start !== null && end !== null) {
 			filteredData = tempData.filter((item: any) => {
 				return (
-					new Date(item.createdAt) >= new Date(startDate) &&
-					new Date(item.createdAt) <= new Date(endDate) &&
-					item.business === business
+					new Date(item.createdAt) >= new Date(start) && new Date(item.createdAt) <= new Date(end)
 				);
 			});
 			filteredData.map((item) => {
 				const cart = item.cart.filter((cartItem) => cartItem.business === business);
-				return {
-					...item,
-					cart
-				};
+				item.cart = cart;
 			});
-		} else if (business === '' && startDate === '' && endDate === '') {
+		} else if (business === '' && start === null && end === null) {
 			filteredData = tempData;
 		} else {
 			filteredData = sourceData.filter((item: any) => {
@@ -178,19 +173,15 @@
 	// pagination event handlers
 	const onAmountChange = (e: CustomEvent): void => {
 		paginationSettings.limit = e.detail;
-		if(filteredData.length > 0)
-			updateTable(filteredData)
-		else
-			updateTable(sourceData);
+		if (filteredData.length > 0) updateTable(filteredData);
+		else updateTable(sourceData);
 	};
 
 	// pagination event handlers
 	const onPageChange = (e: CustomEvent): void => {
 		paginationSettings.page = e.detail;
-		if(filteredData.length > 0)
-			updateTable(filteredData)
-		else
-		updateTable(sourceData);
+		if (filteredData.length > 0) updateTable(filteredData);
+		else updateTable(sourceData);
 	};
 
 	const salesData = (data: any) => {
@@ -205,6 +196,13 @@
 			item.cart.forEach((cart: any) => {
 				item.amount += parseFloat(stringToDecimal(cart.subtotal));
 			});
+
+			// for filtering product by business
+			if (item.amount == 0) {
+				item.downpayment = 0;
+				item.balance = 0;
+			}
+
 			totalSales += parseFloat(stringToDecimal(item.amount));
 			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
 			totalPayment += parseFloat(stringToDecimal(item?.totalPayment || 0));
@@ -218,6 +216,14 @@
 				item.payments.forEach((payment: any) => {
 					payments += parseFloat(stringToDecimal(payment.amount));
 				});
+			}
+
+			if (item?.amount == 0) {
+				payments = 0;
+			}
+
+			if (payments > item?.amount) {
+				payments = item.amount;
 			}
 
 			return {
@@ -250,7 +256,7 @@
 		csvContent +=
 			',Date,Business,Customer,Company,OR No,Description,Amount,DP,Payment,Balance,MOD\n';
 
-			if (filteredData.length > 0) {
+		if (filteredData.length > 0) {
 			filteredData.forEach((item: any) => {
 				// Convert numbers to strings and enclose fields with commas in double quotes
 				const row = [
