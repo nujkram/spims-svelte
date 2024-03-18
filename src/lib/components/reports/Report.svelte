@@ -220,10 +220,10 @@
 
 			if (item?.amount == 0) {
 				payments = 0;
-			}
-
-			if (payments > item?.amount) {
+				totalPayment = 0;
+			} else if (payments > item?.amount) {
 				payments = item.amount;
+				totalPayment = payments;
 			}
 
 			return {
