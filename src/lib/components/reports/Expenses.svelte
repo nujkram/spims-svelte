@@ -66,7 +66,7 @@
 	const filterData = (start: Date, end: Date) => {
 		paginationSettings.page = 0;
 		end.setHours(23, 59, 59);
-		let tempData = salesData(sourceData);
+		let tempData = expensesData(sourceData);
 
 		if (business === '' && start !== null && end !== null) {
 			filteredData = tempData.filter((item: any) => {
