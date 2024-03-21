@@ -23,15 +23,7 @@
 
 	let table: TableSource = {
 		// A list of heading labels.
-		head: [
-			'Date',
-			'Business',
-			'Name',
-			'Invoice',
-			'Description',
-			'Items',
-			'Amount',
-		],
+		head: ['Date', 'Business', 'Name', 'Invoice', 'Description', 'Items', 'Amount'],
 		// The data visibly shown in your table body UI.
 		body: tableMapperValues(sourceData, [
 			'createdAt',
@@ -40,7 +32,7 @@
 			'invoice',
 			'description',
 			'items',
-			'totalAmount',
+			'totalAmount'
 		])
 	};
 
@@ -62,49 +54,45 @@
 		}
 	};
 
+	function isInvalidDate(dateString) {
+		const date = new Date(dateString);
+		return isNaN(date.getTime());
+	}
+
 	// filter sourceData createdAt by date between start and end
 	const filterData = (start: Date, end: Date) => {
 		paginationSettings.page = 0;
 		end.setHours(23, 59, 59);
 		let tempData = expensesData(sourceData);
 
-		if (business === '' && start !== null && end !== null) {
+		if (business === '' && !isInvalidDate(start) && !isInvalidDate(end)) {
 			filteredData = tempData.filter((item: any) => {
 				return (
-					new Date(item.createdAt) >= new Date(start) &&
-					new Date(item.createdAt) <= new Date(end)
+					new Date(item.createdAt) >= new Date(start) && new Date(item.createdAt) <= new Date(end)
 				);
 			});
-		} else if (business !== '' && start !== null && end !== null) {
+		} else if (business !== '' && isInvalidDate(start) && isInvalidDate(end)) {
 			filteredData = tempData.filter((item: any) => {
-				return (
-					new Date(item.createdAt) >= new Date(start) &&
-					new Date(item.createdAt) <= new Date(end)
-				);
-			});
-			filteredData.map((item) => {
-				const cart = item.cart.filter((cartItem) => cartItem.business === business);
-				item.cart
-			});
-		} else if (business === '' && start === null && end === null) {
-			filteredData = tempData;
-		} else {
-			filteredData = sourceData.filter((item: any) => {
 				return item.business === business;
 			});
-			filteredData.map((item) => {
-				const cart = item.cart.filter((cartItem) => cartItem.business === business);
-				return {
-					...item,
-					cart
-				};
+		} else if (business !== '' && !isInvalidDate(start) && !isInvalidDate(end)) {
+			filteredData = tempData.filter((item: any) => {
+				return (
+					new Date(item.createdAt) >= new Date(start) &&
+					new Date(item.createdAt) <= new Date(end) &&
+					item.business === business
+				);
 			});
+		} else {
+			filteredData = tempData;
 		}
+
 		updateTable(filteredData);
 	};
 
 	const updateTable = (sourceData: any) => {
 		sourceData = expensesData(sourceData);
+		console.log(sourceData);
 		paginationSettings.size = sourceData.length;
 		let paginatedData = sourceData.slice(
 			paginationSettings.page * paginationSettings.limit,
@@ -117,7 +105,7 @@
 			'invoice',
 			'description',
 			'items',
-			'totalAmount',
+			'totalAmount'
 		]);
 		table.meta = tableMapperValues(paginatedData, [
 			'createdAt',
@@ -126,7 +114,7 @@
 			'invoice',
 			'description',
 			'items',
-			'totalAmount',
+			'totalAmount'
 		]);
 		table.foot = [
 			'Total',
@@ -223,11 +211,7 @@
 			});
 		}
 
-		const summary = [
-			'\n',
-			'Total Expenses',
-			`"${formatCurrencyNoSymbol(totalExpenses)}"`
-		];
+		const summary = ['\n', 'Total Expenses', `"${formatCurrencyNoSymbol(totalExpenses)}"`];
 		csvContent += summary.join(',') + '\n';
 
 		const encodedUri = encodeURI(csvContent);
