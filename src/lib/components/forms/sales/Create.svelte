@@ -28,6 +28,7 @@
 	let amount: number = 0;
 	let productOptions: any;
 	let products: string[] = [];
+	let description: string = '';
 	let cart: string[] = [];
 	let sourceData: any = [];
 	let business: string = 'RAC';
@@ -40,9 +41,9 @@
 
 	let table: TableSource = {
 		// A list of heading labels.
-		head: ['Name', 'Price', 'Quantity', 'Subtotal'],
+		head: ['Name', 'Description', 'Price', 'Quantity', 'Subtotal'],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['name', 'price', 'quantity', 'subtotal'])
+		body: tableMapperValues(sourceData, ['name', 'description', 'price', 'quantity', 'subtotal'])
 	};
 
 	const updateTable = (sourceData: any) => {
@@ -57,8 +58,20 @@
 			sourceData = [];
 			return;
 		}
-		table.body = tableMapperValues(sourceData, ['name', 'price', 'quantity', 'subtotal']);
-		table.meta = tableMapperValues(sourceData, ['_id', 'price', 'quantity', 'subtotal']);
+		table.body = tableMapperValues(sourceData, [
+			'name',
+			'description',
+			'price',
+			'quantity',
+			'subtotal'
+		]);
+		table.meta = tableMapperValues(sourceData, [
+			'_id',
+			'description',
+			'price',
+			'quantity',
+			'subtotal'
+		]);
 		table.foot = [
 			'Total',
 			'',
@@ -84,13 +97,15 @@
 		customerId = event.detail.meta;
 	};
 
-	const uniqueProducts = new Set(productData.map((item: any) => [item.name, item._id, item.price, item.business]));
+	const uniqueProducts = new Set(
+		productData.map((item: any) => [item.name, item._id, item.price, item.business])
+	);
 
 	productOptions = [...uniqueProducts].map((product: any) => {
 		return {
 			label: product[0],
 			value: product[0],
-			meta: { id: product[1], price: product[2], business: product[3]},
+			meta: { id: product[1], price: product[2], business: product[3] },
 			keywords: product
 		};
 	});
@@ -103,6 +118,7 @@
 		let value = {
 			id: selectedProduct[1].id,
 			name: selectedProduct[0],
+			description: description,
 			price: selectedProduct[1].price,
 			subtotal: selectedProduct[1].price,
 			business: selectedProduct[1].business,
@@ -134,6 +150,7 @@
 		sourceData[newId] = {
 			_id: selectedProduct[1].id,
 			name: selectedProduct[0],
+			description: description,
 			price: inputAmount.outerHTML,
 			quantity: inputQuantity.outerHTML,
 			subtotal: formatCurrencyNoSymbol(stringToDecimal(selectedProduct[1].price))
@@ -182,7 +199,9 @@
 					const value = event.target.value;
 					const id = event.target.id;
 					const index = id.replace('amounts[', '').replace(']', '');
-					const subtotal = formatCurrencyNoSymbol(parseFloat(value) * stringToDecimal(cart[index].quantity));
+					const subtotal = formatCurrencyNoSymbol(
+						parseFloat(value) * stringToDecimal(cart[index].quantity)
+					);
 					sourceData[index].subtotal = subtotal;
 
 					// set the subtotal to the cart
@@ -324,7 +343,11 @@
 		<div class="col-span-1 p-6 flex flex-col gap-4">
 			<h2 class="h4">Products</h2>
 			<div class="mt-3">
-				<span>Products</span>
+				<label class="label">
+					<span>Description</span>
+					<input class="input" type="text" name="description" bind:value={description} />
+				</label>
+				<div class="mt-4">Products</div>
 				<InputChip
 					bind:input={product}
 					bind:value={products}

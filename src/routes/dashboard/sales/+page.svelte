@@ -228,6 +228,7 @@
 				});
 			}
 
+			if(totalBalance < 0) totalBalance = 0;
 			let status = stringToDecimal(item.balance)
 				? '<div class="variant-filled-primary text-center px-2 rounded">Unpaid</div>'
 				: '<div class="variant-filled-success text-center px-2 rounded">Paid</div>';
@@ -241,7 +242,7 @@
 				company:
 					customerData.find((customer: any) => customer._id === item.customerId).company || '',
 				description: item.cart.map((cart: any) => {
-					return ` [${cart.name}, ${cart.price} x ${cart.quantity} = ${cart.subtotal || 0.0}] <br>`;
+					return ` [${cart.name} ${cart?.description || ''}, ${cart.price} x ${cart.quantity} = ${cart.subtotal || 0.0}] <br>`;
 				}),
 				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
 				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
