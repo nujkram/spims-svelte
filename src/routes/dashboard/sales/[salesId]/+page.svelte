@@ -23,8 +23,8 @@
 	let productData: any = [];
 	let cartData: any = [];
 	let tableProducts: TableSource = {
-		head: ['Business', 'Name', 'Price', 'Quantity', 'Subtotal'],
-		body: tableMapperValues(sales?.cart, ['business', 'name', 'price', 'quantity', 'subtotal'])
+		head: ['Business', 'Name', 'Description', 'Price', 'Quantity', 'Subtotal'],
+		body: tableMapperValues(sales?.cart, ['business', 'name', 'description', 'price', 'quantity', 'subtotal'])
 	};
 	let isReady: Boolean = false;
 	let paymentIndex: number;
