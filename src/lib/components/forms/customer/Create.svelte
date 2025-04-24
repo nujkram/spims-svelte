@@ -1,13 +1,6 @@
 <script lang="ts">
-	import {
-		Autocomplete,
-		focusTrap,
-		getToastStore,
-	} from '@skeletonlabs/skeleton';
-	import type {
-		AutocompleteOption,
-		ToastSettings
-	} from '@skeletonlabs/skeleton';
+	import { Autocomplete, focusTrap, getToastStore } from '@skeletonlabs/skeleton';
+	import type { AutocompleteOption, ToastSettings } from '@skeletonlabs/skeleton';
 
 	export let loadData: () => void;
 	export let drawerStore = () => {};
@@ -42,7 +35,7 @@
 	// autocomplete company selection event handler function to update company value on selection
 	const onCompanySelection = (event: CustomEvent<AutocompleteOption<string>>): void => {
 		company = event.detail.label;
-	}
+	};
 </script>
 
 <form

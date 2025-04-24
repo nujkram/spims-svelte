@@ -31,7 +31,7 @@
 	// autocomplete category selection event handler function to update category value on selection
 	const onCategorySelection = (event: CustomEvent<AutocompleteOption<string>>): void => {
 		category = event.detail.label;
-	}
+	};
 </script>
 
 <form

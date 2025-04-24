@@ -93,14 +93,13 @@
 			toastSettings.message = result.message;
 			toastStore.trigger(toastSettings);
 			goto('/dashboard/expenses');
-		}
-		catch (error) {
+		} catch (error) {
 			toastSettings.message = error.message;
 			toastSettings.background = 'bg-red-500';
 			toastStore.trigger(toastSettings);
 			console.error(error);
 		}
-	}
+	};
 
 	onMount(async () => {
 		await loadData();
@@ -115,11 +114,11 @@
 		<h1 class="h1">{expenses?.name || 'NA'}</h1>
 		<h2 class="h2 italic">{expenses?.description || 'NA'}</h2>
 		<div class="flex flex-col md:flex-row w-full gap-4 justify-between mt-4">
-            <div class="flex flex-col items-center">
+			<div class="flex flex-col items-center">
 				<h3 class="h3">Invoice No</h3>
 				<p class="p">{expenses?.invoice || 'NA'}</p>
 			</div>
-            <div class="flex flex-col items-center">
+			<div class="flex flex-col items-center">
 				<h3 class="h3">Business</h3>
 				<p class="p">{expenses?.business || 'NA'}</p>
 			</div>
@@ -144,7 +143,7 @@
 			{formatCurrency(stringToDecimal(expenses?.totalAmount)) || 0.0}
 		</h2>
 		<p class="p text-xl">Total</p>
-		
+
 		<div class="flex w-full mt-6">
 			<Table source={table} />
 		</div>
@@ -160,12 +159,6 @@
 
 <Drawer>
 	{#if $drawerStore.id === 'updateExpenses'}
-		<Update
-			id={expenses?._id}
-			moduleName={'expenses'}
-			{expenses}
-			{drawerStore}
-            {sourceData}
-		/>
+		<Update id={expenses?._id} moduleName={'expenses'} {expenses} {drawerStore} {sourceData} />
 	{/if}
 </Drawer>

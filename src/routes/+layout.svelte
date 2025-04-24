@@ -39,7 +39,7 @@
 
 	const handleLogout = () => {
 		goto('/auth/logout/');
-	}
+	};
 
 	const drawerSettings: DrawerSettings = {
 		id: 'mobileSidebar',
@@ -55,7 +55,7 @@
 
 	const drawerOpen = (): void => {
 		drawerStore.open(drawerSettings);
-	}
+	};
 </script>
 
 <Drawer>
@@ -96,7 +96,9 @@
 				</a>
 				<LightSwitch />
 				{#if $page.data.user}
-					<button class="btn variant-filled w-auto" use:popup={popupClick}>Hi, {$page.data.user.firstName || 'User'}</button>
+					<button class="btn variant-filled w-auto" use:popup={popupClick}
+						>Hi, {$page.data.user.firstName || 'User'}</button
+					>
 					<div class="card p-4 bg-gray-900" data-popup="popupClick">
 						<button
 							type="button"

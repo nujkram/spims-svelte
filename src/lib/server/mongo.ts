@@ -32,13 +32,13 @@ const connectToDatabase = async () => {
 	const currentDb = uri?.includes('Staging')
 		? 'RageAvenueStaging'
 		: uri?.includes('Test')
-		? 'RageAvenueStagingTest'
-		: 'RageAvenue';
+			? 'RageAvenueStagingTest'
+			: 'RageAvenue';
 
 	const db = await client.db(currentDb);
 	cachedDb = db;
 	return db;
-}
+};
 const clientPromise = async () => await connectToDatabase();
 // cachedDb = new MongoClient(uri, options);
 // clientPromise = cachedDb.connect();

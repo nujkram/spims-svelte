@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { AppRail, AppRailAnchor } from '@skeletonlabs/skeleton';
-	import { Box, Cart, CashStack, FileBarGraph, Home, People, Tag, Wallet } from '$lib/components/icons/index';
+	import {
+		Box,
+		Cart,
+		CashStack,
+		FileBarGraph,
+		Home,
+		People,
+		Tag,
+		Wallet
+	} from '$lib/components/icons/index';
 	export let user: any;
 </script>
 

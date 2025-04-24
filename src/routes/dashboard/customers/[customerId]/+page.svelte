@@ -22,7 +22,7 @@
 			response: () => handleDelete()
 		},
 		timeout: 8000
-	}
+	};
 
 	// drawer settings
 	const drawerUpdate: DrawerSettings = {
@@ -60,14 +60,13 @@
 			toastSettings.message = result.message;
 			toastStore.trigger(toastSettings);
 			goto('/dashboard/customers');
-		}
-		catch (error) {
+		} catch (error) {
 			toastSettings.message = error.message;
 			toastSettings.background = 'bg-red-500';
 			toastStore.trigger(toastSettings);
 			console.error(error);
 		}
-	}
+	};
 </script>
 
 <div class="card p-4">
