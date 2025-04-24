@@ -1,91 +1,91 @@
 import clientPromise from '$lib/server/mongo';
+import { json } from '@sveltejs/kit';
 
 /** @type {import('./$types').RequestHandler} */
-export const GET = async () => {
-    const db = await clientPromise();
-    const Sales = db.collection('sales');
-    const Customers = db.collection('customers');
-    const Products = db.collection('products');
+export const GET = async ({ url }) => {
+	try {
+		const db = await clientPromise();
+		const Sales = db.collection('sales');
+		const Customers = db.collection('customers');
+		const Products = db.collection('products');
 
-    const customers = await Customers.find({}).sort({ createdAt: -1 }).toArray();
-    const products = await Products.find({}).sort({ createdAt: -1 }).toArray();
+		// Get year from query params, default to current year
+		const yearParam = url.searchParams.get('year');
+		const year = parseInt(yearParam || new Date().getFullYear().toString());
 
-    const pipeline = [
-        {
-            $match: {
-                isActive: true,
-            }
-        },
-        {
-            $lookup: {
-                from: 'customers',
-                localField: 'customerId',
-                foreignField: '_id',
-                as: 'customer'
-            },
-        },
-        {
-            $lookup: {
-                'from': 'users',
-                'localField': 'createdBy',
-                'foreignField': '_id',
-                'as': 'createdBy'
-            },
-        },
-        {
-            $lookup: {
-                'from': 'users',
-                'localField': 'updatedBy',
-                'foreignField': '_id',
-                'as': 'updatedBy'
-            },
-        },
-        {
-            $unwind: {
-                path: '$customer',
-                preserveNullAndEmptyArrays: true
-            },
-        },
-        {
-            $unwind: {
-                path: '$createdBy',
-                preserveNullAndEmptyArrays: true
-            },
-        },
-        {
-            $unwind: {
-                path: '$updatedBy',
-                preserveNullAndEmptyArrays: true
-            },
-        },
-        {
-            $sort: { createdAt: -1 }
-        }
-    ]
+		// Calculate start and end of the target year
+		const startOfYear = new Date(year, 0, 1);
+		const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
 
-    const sales = await Sales.aggregate(pipeline).toArray();
+		const salesPipeline = [
+			{
+				$match: {
+					isActive: true,
+					// Add date filtering to the main match stage
+					createdAt: {
+						$gte: startOfYear,
+						$lte: endOfYear
+					}
+				}
+			},
+			{
+				$lookup: {
+					from: 'customers',
+					localField: 'customerId',
+					foreignField: '_id',
+					as: 'customer'
+				}
+			},
+			{
+				$unwind: {
+					path: '$customer',
+					preserveNullAndEmptyArrays: true
+				}
+			},
+			{
+				$addFields: {
+					totalPayment: {
+						$ifNull: [
+							{
+								$reduce: {
+									input: '$payments',
+									initialValue: 0,
+									in: { $add: ['$$value', { $toDouble: '$$this.amount' }] }
+								}
+							},
+							0 // Default value if payments is null or missing
+						]
+					}
+				}
+			},
+			{
+				$addFields: {
+					balance: {
+						$subtract: [
+							{ $toDouble: '$amount' },
+							{ $add: [{ $toDouble: '$downpayment' }, '$totalPayment'] }
+						]
+					}
+				}
+			},
+			{
+				$sort: { createdAt: -1 } // Often more useful to sort recent first
+			}
+		];
 
-    // Add totalPayment to sales
-    sales.map((item) => {
-        if (item.payments) {
-            item.totalPayment = item.payments.reduce((acc, curr) => parseFloat(acc) + parseFloat(curr.amount), 0);
-        } else {
-            item.totalPayment = 0;
-        }
-        item.balance = parseFloat(item.amount) - (parseFloat(item.downpayment) + parseFloat(item.totalPayment));
+		// Fetch related data (consider if these also need filtering or if fetching all is okay)
+		const customers = await Customers.find({}).toArray();
+		const products = await Products.find({}).toArray();
+		const sales = await Sales.aggregate(salesPipeline).toArray();
 
-    })
+		const response = {
+			sales,
+			customers,
+			products
+		};
 
-    if (sales) {
-        return new Response(
-            JSON.stringify({
-                status: 'Success',
-                response: {
-                    sales,
-                    customers,
-                    products
-                }
-            })
-        )
-    }
-}
+		return json({ response });
+	} catch (err) {
+		return json({ error: 'Failed to fetch sales data.' }, { status: 500 });
+	}
+};

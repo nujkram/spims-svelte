@@ -1,8 +1,8 @@
-
 <script lang="ts">
 	export let width: number = 16;
 	export let height: number = 16;
 </script>
+
 <svg
 	xmlns="http://www.w3.org/2000/svg"
 	{width}

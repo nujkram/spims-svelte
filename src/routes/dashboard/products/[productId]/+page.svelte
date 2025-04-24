@@ -34,7 +34,9 @@
 		<Avatar initials={fullNameInitial} background="bg-primary-500" fontSize={250} width="w-28" />
 	</header>
 	<section class="p-4 flex flex-col items-center">
-		<h1 class="h1">{product?.name || 'NA'} (<span class="text-success-500">{product?.price}</span>)</h1>
+		<h1 class="h1">
+			{product?.name || 'NA'} (<span class="text-success-500">{product?.price}</span>)
+		</h1>
 		<h2 class="h2 italic">{product?.category || 'NA'}</h2>
 		<div class="flex flex-col md:flex-row w-full gap-4 justify-between mt-4">
 			<div class="flex flex-col items-center">

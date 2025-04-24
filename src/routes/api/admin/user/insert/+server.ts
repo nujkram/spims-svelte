@@ -8,12 +8,12 @@ export const POST = async ({ request, locals }: any) => {
 	const User = db.collection('users');
 
 	for (const key in data) {
-        if(key === '_id') continue;
-		if(key === 'username') continue;
-		if(key === 'password') continue;
-        if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
-		if(key === 'email') data[key] = data[key].toLowerCase();
-    }
+		if (key === '_id') continue;
+		if (key === 'username') continue;
+		if (key === 'password') continue;
+		if (typeof data[key] === 'string') data[key] = data[key].toUpperCase();
+		if (key === 'email') data[key] = data[key].toLowerCase();
+	}
 
 	const user = {
 		_id: id(),
@@ -34,7 +34,7 @@ export const POST = async ({ request, locals }: any) => {
 			}
 		],
 		fullName: `${data.firstName} ${data.lastName}`,
-        firstName: data.firstName,
+		firstName: data.firstName,
 		lastName: data.lastName,
 		username: data.username,
 		phone: data.phone,
@@ -44,8 +44,8 @@ export const POST = async ({ request, locals }: any) => {
 		role: data.role,
 		createdBy: locals.user._id,
 		updatedBy: locals.user._id
-	}
-	
+	};
+
 	const response = await User.insertOne(user);
 	if (response) {
 		return new Response(
@@ -56,4 +56,4 @@ export const POST = async ({ request, locals }: any) => {
 			})
 		);
 	}
-}
+};

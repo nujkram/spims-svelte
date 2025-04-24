@@ -26,7 +26,7 @@
 
 	const redirect = () => {
 		goto('/dashboard');
-	}
+	};
 
 	const handleLogin = async () => {
 		const securePassword = await SHA256(password).toString();
@@ -76,7 +76,7 @@
 		width: 'w-[280px] md:w-[480px]',
 		padding: 'p-4',
 		rounded: 'rounded-xl',
-		position: 'right',
+		position: 'right'
 	};
 
 	const drawerStore = getDrawerStore();
@@ -90,7 +90,7 @@
 	};
 </script>
 
-<div class="container h-full mx-auto flex justify-center items-center lg:pr-64  pr-0">
+<div class="container h-full mx-auto flex justify-center items-center lg:pr-64 pr-0">
 	<div class="space-y-10 text-center flex flex-col items-center">
 		<h2 class="md:h2 h4">Welcome to Rage Avenue Co.</h2>
 		<!-- Animated Logo -->
@@ -172,11 +172,23 @@
 	>
 		<label class="label mt-4">
 			<span>Username</span>
-			<input class="input" type="text" placeholder="username" name="username" bind:value={username} />
+			<input
+				class="input"
+				type="text"
+				placeholder="username"
+				name="username"
+				bind:value={username}
+			/>
 		</label>
 		<label class="label mt-4">
 			<span>Password</span>
-			<input class="input" type="password" placeholder="password" name="password" bind:value={password} />
+			<input
+				class="input"
+				type="password"
+				placeholder="password"
+				name="password"
+				bind:value={password}
+			/>
 		</label>
 
 		<button type="submit" class="btn variant-filled mt-4">Login</button>

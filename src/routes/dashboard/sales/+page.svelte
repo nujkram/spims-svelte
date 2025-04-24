@@ -17,24 +17,38 @@
 		stringToDecimal
 	} from '$lib/utils/currencyHelper';
 	import dateToString from '$lib/utils/dateHelper';
-	import Payment from '$lib/components/forms/sales/Payment.svelte';
+
+	// Define a basic Customer interface
+	interface Customer {
+		_id: string;
+		fullName?: string; // Make properties optional if they might not exist
+		address?: string;
+		company?: string;
+		// Add other relevant customer properties if needed
+	}
 
 	let isReady: Boolean = false;
 	let keyword: string = '';
 	let startDate: string = '';
 	let endDate: string = '';
 
-	let sourceData: any = [];
-	let customerData: any = [];
+	// --- Year Filter State ---
+	const actualCurrentYear = new Date().getFullYear();
+	const yearOptions = Array.from({ length: 5 }, (_, i) => actualCurrentYear - i);
+	let selectedYear = actualCurrentYear; // Default to current year
+	// ------------------------
+
+	let allSalesData: any = []; // Store the raw data fetched for the selected year
+	let filteredSalesData: any = []; // Store data after client-side filtering (keyword, date)
+	let customerData: Customer[] = []; // Use the Customer interface
 	let productData: any = [];
 	let totalSales: number = 0;
 	let totalDownpayment: number = 0;
 	let totalPayment: number = 0;
 	let totalBalance: number = 0;
-	let payments: number = 0;
+	let currentLoadedYear: number | null = null; // Track which year's data is currently loaded
 
 	let table: TableSource = {
-		// A list of heading labels.
 		head: [
 			'Date',
 			'Business',
@@ -47,45 +61,46 @@
 			'MOD',
 			'Status'
 		],
-		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, [
-			'createdAt',
-			'business',
-			'customer',
-			'description',
-			'amount',
-			'downpayment',
-			'payment',
-			'balance',
-			'paymentMethod',
-			'status'
-		])
+		body: [], // Start empty
+		meta: [], // Start empty
+		foot: [] // Start empty
 	};
 
-	async function loadData() {
+	// Fetch data based on the selected year
+	async function loadDataForYear(year: number) {
+		if (currentLoadedYear === year) return; // Skip if we already have this year's data
+
+		isReady = false; // Show loading state
 		try {
-			let response = await fetch('/api/admin/sales', {
+			let response = await fetch(`/api/admin/sales?year=${year}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json'
 				}
 			});
 
-			let result = await response.json();
-			sourceData = result.response.sales;
-			customerData = result.response.customers;
-			productData = result.response.products;
+			if (!response.ok) {
+				throw new Error(`API Error: ${response.statusText}`);
+			}
 
-			salesData(sourceData);
-			if (sourceData) updateTable(sourceData);
+			let result = await response.json();
+			allSalesData = result.response.sales || []; // Store fetched data
+			customerData = result.response.customers || [];
+			productData = result.response.products || [];
+			currentLoadedYear = year; // Update the currently loaded year
+
+			applyFiltersAndCalculateTotals(); // Apply client-side filters and update table
 		} catch (error) {
-			console.error(error);
+			console.error('Failed to load sales data:', error);
+			allSalesData = []; // Clear data on error
+			applyFiltersAndCalculateTotals(); // Update table with empty data
+		} finally {
+			isReady = true; // Hide loading state
 		}
 	}
 
 	const drawerCreate: DrawerSettings = {
 		id: 'createSalesOrder',
-		// Provide your property overrides:
 		bgDrawer: 'bg-gradient-to-t from-slate-900 via-gray-950 to-zinc-950 text-white',
 		bgBackdrop: 'bg-gradient-to-tr from-slate-900/50 via-gray-950/50 to-zinc-950/50',
 		width: 'w-[280px] md:w-[1920px]',
@@ -97,37 +112,111 @@
 	const drawerStore = getDrawerStore();
 	drawerStore.close();
 
-	const filterTable = (keyword: string) => {
-		paginationSettings.page = 0;
-		let tempData = salesData(sourceData);
-		if (keyword.length > 0) {
-			let filteredData = tempData.filter((item: any) => {
+	// --- Client-Side Filtering & Table Update Logic ---
+	function applyFiltersAndCalculateTotals() {
+		let dataToFilter = [...allSalesData]; // Work on a copy of the fetched data
+
+		// 1. Apply keyword filter
+		if (keyword.trim().length > 0) {
+			const upperKeyword = keyword.trim().toUpperCase();
+			// Pre-process customer lookups for efficiency
+			const customerMap = new Map<string, Customer>(customerData.map((c) => [c._id, c])); // Specify types for Map
+			dataToFilter = dataToFilter.filter((item: any) => {
+				const customer = customerMap.get(item.customerId);
+				if (!customer) return false; // Skip if customer not found
 				return (
-					item.customer.includes(keyword.toUpperCase()) ||
-					item.address.includes(keyword.toUpperCase()) ||
-					item.company.includes(keyword.toUpperCase())
+					customer.fullName?.toUpperCase().includes(upperKeyword) ||
+					customer.address?.toUpperCase().includes(upperKeyword) ||
+					customer.company?.toUpperCase().includes(upperKeyword)
 				);
 			});
-			updateTable(filteredData);
-		} else {
-			updateTable(sourceData);
 		}
-	};
 
-	// filter sourceData createdAt by date between start and end
-	const filterByDate = (start: Date, end: Date) => {
-		paginationSettings.page = 0;
-		let tempData = salesData(sourceData);
-		let filteredData = tempData.filter((item: any) => {
-			return new Date(item.createdAt) >= start && new Date(item.createdAt) <= end;
+		// 2. Apply date range filter (if start or end date is set)
+		if (startDate || endDate) {
+			const start = startDate ? new Date(startDate).setHours(0, 0, 0, 0) : null;
+			const end = endDate ? new Date(endDate).setHours(23, 59, 59, 999) : null;
+
+			dataToFilter = dataToFilter.filter((item: any) => {
+				const itemDate = new Date(item.createdAt).getTime();
+				const afterStart = start ? itemDate >= start : true;
+				const beforeEnd = end ? itemDate <= end : true;
+				return afterStart && beforeEnd;
+			});
+		}
+
+		// 3. Process data for display (formatting, calculations)
+		filteredSalesData = processSalesDataForDisplay(dataToFilter);
+
+		// 4. Update table with filtered and processed data
+		updateTable(filteredSalesData);
+	}
+
+	const processSalesDataForDisplay = (data: any[]) => {
+		// Reset totals before recalculating based on *filtered* data
+		totalSales = 0;
+		totalDownpayment = 0;
+		totalPayment = 0;
+		totalBalance = 0;
+
+		return data.map((item: any) => {
+			const itemAmount = parseFloat(stringToDecimal(item.amount));
+			const itemDP = parseFloat(stringToDecimal(item.downpayment));
+			const itemTotalPayment = parseFloat(stringToDecimal(item?.totalPayment || 0)); // Already calculated in API
+			let itemBalance = itemAmount - (itemDP + itemTotalPayment);
+			if (itemBalance < 0.01 && itemBalance > -0.01) itemBalance = 0; // Handle floating point issues near zero
+
+			totalSales += itemAmount;
+			totalDownpayment += itemDP;
+			totalPayment += itemTotalPayment; // Sum up the pre-calculated total payment
+			totalBalance += itemBalance;
+
+			let displayPayments = 0;
+			if (item.payments && Array.isArray(item.payments)) {
+				displayPayments = item.payments.reduce((acc: number, payment: any) => {
+					return acc + parseFloat(stringToDecimal(payment.amount));
+				}, 0);
+			}
+
+			let status =
+				itemBalance <= 0
+					? '<div class="variant-soft-success text-center px-2 rounded">Paid</div>'
+					: '<div class="variant-soft-warning text-center px-2 rounded">Unpaid</div>';
+
+			const customer = customerData.find((c: any) => c._id === item.customerId);
+
+			return {
+				...item,
+				customer: customer?.fullName || 'N/A',
+				description:
+					item.cart
+						?.map((cart: any) => {
+							return ` [${cart.name} ${cart?.description || ''}, ${cart.price} x ${
+								cart.quantity
+							} = ${cart.subtotal || 0.0}] <br>`;
+						})
+						.join('') || 'N/A',
+				amount: formatCurrencyNoSymbol(itemAmount),
+				downpayment: formatCurrencyNoSymbol(itemDP),
+				payment: formatCurrencyNoSymbol(displayPayments), // Show sum of individual payments
+				balance: formatCurrencyNoSymbol(itemBalance),
+				createdAt: dateToString(item.createdAt, 'yyyy-MM-dd'), // Simpler date format
+				status
+			};
 		});
-		updateTable(filteredData);
 	};
 
-	const updateTable = (sourceData: any) => {
-		sourceData = salesData(sourceData);
-		paginationSettings.size = sourceData.length;
-		let paginatedData = sourceData.slice(
+	const updateTable = (processedData: any[]) => {
+		paginationSettings.size = processedData.length;
+		// Ensure page number is valid after filtering
+		if (paginationSettings.page * paginationSettings.limit >= paginationSettings.size) {
+			paginationSettings.page = Math.max(
+				0,
+				Math.ceil(paginationSettings.size / paginationSettings.limit) - 1
+			);
+		}
+
+		let paginatedData = processedData.slice(
 			paginationSettings.page * paginationSettings.limit,
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 		);
@@ -146,7 +235,7 @@
 		table.meta = tableMapperValues(paginatedData, [
 			'createdAt',
 			'business',
-			'_id',
+			'_id', // Keep ID for row click
 			'description',
 			'amount',
 			'downpayment',
@@ -156,176 +245,147 @@
 			'status'
 		]);
 
-		if ($page.data.user.role == 'ADMINISTRATOR') {
+		if ($page.data.user?.role == 'ADMINISTRATOR') {
+			// Totals are now calculated based on the FILTERED data
 			table.foot = [
 				'Total',
+				'',
 				`<div class="variant-filled-success px-2 rounded">${formatCurrency(
 					totalDownpayment + totalPayment
-				)}</div>`,
-				'',
-				'',
-				`<div class="variant-filled-secondary px-2 rounded">${formatCurrency(totalSales)}</div>`,
+				)}</div>`, // Income
+				'', // Desc
+				`<div class="variant-filled-secondary px-2 rounded">${formatCurrency(totalSales)}</div>`, // Amount
 				`<div class="variant-filled-success px-2 rounded">${formatCurrency(
 					totalDownpayment
-				)}</div>`,
-				`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalPayment)}</div>`,
-				`<div class="variant-filled-error px-2 rounded">${formatCurrency(totalBalance)}</div>`,
-				'',
-				`<code class="code">${sourceData.length}</code>`
+				)}</div>`, // DP
+				`<div class="variant-filled-success px-2 rounded">${formatCurrency(totalPayment)}</div>`, // Payment
+				`<div class="variant-filled-warning px-2 rounded">${formatCurrency(totalBalance)}</div>`, // Balance
+				'', // MOD
+				`<code class="code">${processedData.length} / ${allSalesData.length}</code>` // Show filtered / total for year
 			];
+		} else {
+			table.foot = [];
 		}
 	};
 
 	let paginationSettings = {
 		page: 0,
 		limit: 10,
-		size: sourceData.length,
+		size: 0, // Start with 0
 		amounts: [10, 20, 25, 30, 50, 100]
 	} satisfies PaginationSettings;
 
-	// pagination event handlers
 	function onPageChange(e: CustomEvent): void {
-		paginationSettings.page = e.detail;
-		updateTable(sourceData);
+		paginationSettings.page = e.detail; // Corrected typo
+		updateTable(filteredSalesData); // Update table with current filtered data
 	}
 
-	// pagination event handlers
 	function onAmountChange(e: CustomEvent): void {
-		paginationSettings.limit = e.detail;
-		updateTable(sourceData);
+		paginationSettings.limit = e.detail; // Corrected typo
+		paginationSettings.page = 0; // Corrected typo & reset to first page on limit change
+		updateTable(filteredSalesData); // Update table with current filtered data
 	}
 
 	onMount(async () => {
-		await loadData();
-		isReady = true;
+		await loadDataForYear(selectedYear); // Load initial data for default year
 	});
 
-	// table row select handler
 	function tableSelectHandler(e: CustomEvent): void {
-		goto(`/dashboard/sales/${e.detail[2]}`);
+		const selectedId = e.detail[2]; // Get ID from meta
+		if (selectedId) {
+			goto(`/dashboard/sales/${selectedId}`);
+		}
 	}
 
-	const salesData = (data: any) => {
-		totalSales = 0;
-		totalDownpayment = 0;
-		totalPayment = 0;
-		totalBalance = 0;
-		payments = 0;
+	// --- Reactive Triggers ---
+	$: if (isReady) {
+		// This block now correctly depends on keyword, startDate, and endDate.
+		// It will re-run whenever any of these change *after* the initial load.
+		applyFiltersAndCalculateTotals();
+		// Explicitly mentioning them ensures reactivity
+		keyword;
+		startDate;
+		endDate;
+	}
 
-		return data.map((item: any) => {
-			totalSales += parseFloat(stringToDecimal(item.amount));
-			totalDownpayment += parseFloat(stringToDecimal(item.downpayment));
-			totalPayment += parseFloat(stringToDecimal(item?.totalPayment || 0));
-			totalBalance +=
-				parseFloat(stringToDecimal(item.amount)) -
-				(parseFloat(stringToDecimal(item.downpayment)) +
-					parseFloat(stringToDecimal(item.totalPayment || 0)));
-
-			payments = 0;
-			if (item && item?.payments) {
-				item.payments.forEach((payment: any) => {
-					payments += parseFloat(stringToDecimal(payment.amount));
-				});
-			}
-
-			if(totalBalance < 0) totalBalance = 0;
-			let status = stringToDecimal(item.balance)
-				? '<div class="variant-filled-primary text-center px-2 rounded">Unpaid</div>'
-				: '<div class="variant-filled-success text-center px-2 rounded">Paid</div>';
-
-			return {
-				...item,
-				customer:
-					customerData.find((customer: any) => customer._id === item.customerId).fullName || '',
-				address:
-					customerData.find((customer: any) => customer._id === item.customerId).address || '',
-				company:
-					customerData.find((customer: any) => customer._id === item.customerId).company || '',
-				description: item.cart.map((cart: any) => {
-					return ` [${cart.name} ${cart?.description || ''}, ${cart.price} x ${cart.quantity} = ${cart.subtotal || 0.0}] <br>`;
-				}),
-				amount: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.amount))),
-				downpayment: formatCurrencyNoSymbol(parseFloat(stringToDecimal(item.downpayment))),
-				totalPayment: formatCurrencyNoSymbol(parseFloat(item.totalPayment)),
-				payment: formatCurrencyNoSymbol(payments),
-				balance: formatCurrencyNoSymbol(stringToDecimal(item.balance)),
-				createdAt: dateToString(item.createdAt),
-				status
-			};
-		});
-	};
-
-	$: filterTable(keyword);
-	$: filterByDate(new Date(startDate), new Date(endDate));
+	$: if (selectedYear && isReady && currentLoadedYear !== selectedYear) {
+		// Load new data when selectedYear changes (after initial mount)
+		loadDataForYear(selectedYear);
+	}
 </script>
 
 <div class="card mb-4">
-	<header class="card-header">
+	<header class="card-header flex justify-between items-center">
 		<h1 class="h3">Sales Order</h1>
+		<!-- Year Selector -->
+		<div class="flex items-center gap-2">
+			<span class="text-surface-500">Year:</span>
+			<select bind:value={selectedYear} class="select" disabled={!isReady}>
+				{#each yearOptions as year}
+					<option value={year}>{year}</option>
+				{/each}
+			</select>
+		</div>
 	</header>
 	{#if !isReady}
-		<section class="flex p-4 w-full gap-12 items-center">
-			<div class="placeholder-circle animate-pulse w-32 h-16" />
-			<div class="placeholder animate-pulse w-96" />
-			<div class="placeholder animate-pulse w-52" />
-			<div class="placeholder animate-pulse w-52" />
+		<section class="p-4">
+			<p>Loading sales data...</p>
+			<!-- Optional: Add skeleton loaders here -->
 		</section>
 	{:else}
-		<section class="flex p-4 w-full gap-4">
-			<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
-				>Add <br />Sales Order</button
+		<section class="flex p-4 w-full gap-4 flex-wrap">
+			<button
+				class="btn variant-filled-primary self-end"
+				on:click={() => drawerStore.open(drawerCreate)}
 			>
-			<label class="label flex-auto">
+				Add Sales Order
+			</button>
+			<label class="label flex-auto min-w-[300px]">
 				<span>Search</span>
 				<input
 					class="input"
-					type="text"
-					placeholder="Search by customer, company, or address"
+					type="search"
+					placeholder="Search Customer, Company, Address..."
 					name="keyword"
 					bind:value={keyword}
-					on:input={() => filterTable(keyword)}
 				/>
 			</label>
-			<!-- start date field and end date field -->
-			<div class="flex gap-4">
+			<!-- Date Range Filter -->
+			<div class="flex gap-4 flex-wrap self-end">
 				<label class="label">
 					<span>Start Date</span>
-					<input
-						class="input"
-						type="date"
-						name="startDate"
-						bind:value={startDate}
-						on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
-					/>
+					<input class="input" type="date" name="startDate" bind:value={startDate} />
 				</label>
 				<label class="label">
 					<span>End Date</span>
-					<input
-						class="input"
-						type="date"
-						name="endDate"
-						bind:value={endDate}
-						on:change={() => filterByDate(new Date(startDate), new Date(endDate))}
-					/>
+					<input class="input" type="date" name="endDate" bind:value={endDate} />
 				</label>
 			</div>
 		</section>
 	{/if}
 </div>
 
-{#key sourceData}
-	<Table source={table} interactive={true} on:selected={tableSelectHandler} />
-	<Paginator
-		class="mt-4"
-		bind:settings={paginationSettings}
-		on:page={onPageChange}
-		on:amount={onAmountChange}
-		showFirstLastButtons={false}
-		showPreviousNextButtons={true}
-	/>
+{#key allSalesData}
+	<!-- Re-render table section when data changes -->
+	{#if isReady && filteredSalesData.length > 0}
+		<Table source={table} interactive={true} on:selected={tableSelectHandler} />
+		<Paginator
+			class="mt-4"
+			bind:settings={paginationSettings}
+			on:page={onPageChange}
+			on:amount={onAmountChange}
+			showFirstLastButtons={false}
+			showPreviousNextButtons={true}
+		/>
+	{:else if isReady}
+		<div class="card p-4 text-center">
+			<p>No sales records found for the selected criteria.</p>
+		</div>
+	{/if}
 {/key}
+
 <Drawer>
 	{#if $drawerStore.id === 'createSalesOrder'}
-		<Create {drawerStore} {loadData} {customerData} {productData} />
+		<Create {drawerStore} {loadDataForYear} bind:selectedYear {customerData} {productData} />
 	{/if}
 </Drawer>

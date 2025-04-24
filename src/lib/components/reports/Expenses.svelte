@@ -92,7 +92,6 @@
 
 	const updateTable = (sourceData: any) => {
 		sourceData = expensesData(sourceData);
-		console.log(sourceData);
 		paginationSettings.size = sourceData.length;
 		let paginatedData = sourceData.slice(
 			paginationSettings.page * paginationSettings.limit,

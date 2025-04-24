@@ -3,8 +3,8 @@
 	import { focusTrap, getToastStore } from '@skeletonlabs/skeleton';
 	import type { ToastSettings } from '@skeletonlabs/skeleton';
 
-    export let loadData: () => void;
-    export let drawerStore = () => {};
+	export let loadData: () => void;
+	export let drawerStore = () => {};
 
 	let isFocused: boolean = true;
 	let lastName: string,

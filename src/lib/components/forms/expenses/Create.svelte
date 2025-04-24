@@ -17,7 +17,7 @@
 	export let loadData: () => void;
 	export let drawerStore = () => {};
 	export let sourceData: string[] = [];
-	
+
 	let isFocused: boolean = true;
 	let invoice: string = '';
 	let description: string = '';
@@ -80,16 +80,18 @@
 		name = event.detail.value;
 	};
 
-	const uniqueItems = new Set(sourceData.flatMap((item: any) => item.cart.map(cart => cart.name)));
+	const uniqueItems = new Set(
+		sourceData.flatMap((item: any) => item.cart.map((cart) => cart.name))
+	);
 	if (uniqueItems.size > 0) {
-        itemOptions = [...uniqueItems].map((item: any) => {
-            return {
-                label: item,
-                value: item,
-                keywords: item
-            };
-        });
-    }
+		itemOptions = [...uniqueItems].map((item: any) => {
+			return {
+				label: item,
+				value: item,
+				keywords: item
+			};
+		});
+	}
 
 	const onItemAdd = () => {
 		let name = items[items.length - 1].toUpperCase();
@@ -133,8 +135,8 @@
 			paymentMethod: selectPaymentMethod.outerHTML
 		};
 		updateTable(cartData);
-        amountEventListener();
-		paymentMethodEventListener()
+		amountEventListener();
+		paymentMethodEventListener();
 	};
 
 	// autocomplete item selection event handler function to update item value on selection
@@ -181,7 +183,7 @@
 			paymentMethod: selectPaymentMethod.outerHTML
 		};
 		updateTable(cartData);
-        amountEventListener();
+		amountEventListener();
 		paymentMethodEventListener();
 	};
 
@@ -192,7 +194,7 @@
 		updateTable(cartData);
 	};
 
-    const amountEventListener = () => {
+	const amountEventListener = () => {
 		setTimeout(() => {
 			const inputAmount = document.querySelectorAll('[name="amounts"]');
 			inputAmount.forEach((input) => {
@@ -201,13 +203,13 @@
 					const value = event.target.value;
 					const id = event.target.id;
 					const index = id.replace('amounts[', '').replace(']', '');
-                    
+
 					// set the subtotal to the cart
 					cart[index].amount = value;
-                    totalAmount = cart.reduce(
-                        (a: any, b: any) => parseFloat(a) + parseFloat(stringToDecimal(b.amount)),
-                        0
-                    );
+					totalAmount = cart.reduce(
+						(a: any, b: any) => parseFloat(a) + parseFloat(stringToDecimal(b.amount)),
+						0
+					);
 
 					updateTable(cartData);
 				});
@@ -215,7 +217,7 @@
 		}, 1000);
 	};
 
-    const paymentMethodEventListener = () => {
+	const paymentMethodEventListener = () => {
 		setTimeout(() => {
 			const inputPaymentMethod = document.querySelectorAll('[name="paymentMethods"]');
 			inputPaymentMethod.forEach((input) => {
@@ -224,7 +226,7 @@
 					const value = event.target.value;
 					const id = event.target.id;
 					const index = id.replace('paymentMethods[', '').replace(']', '');
-                    
+
 					// set the subtotal to the cart
 					cart[index].paymentMethod = value;
 
@@ -271,7 +273,7 @@
 				})
 				.filter((value) => value !== null);
 
-				// Add payment method to each item
+			// Add payment method to each item
 			cart = cart.map((item, index) => {
 				const paymentMethod = paymentMethods[index];
 				// Add the payment method to the item
@@ -285,7 +287,7 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-                    invoice,
+					invoice,
 					business,
 					name,
 					description,

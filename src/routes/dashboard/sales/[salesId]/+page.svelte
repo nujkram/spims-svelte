@@ -24,7 +24,14 @@
 	let cartData: any = [];
 	let tableProducts: TableSource = {
 		head: ['Business', 'Name', 'Description', 'Price', 'Quantity', 'Subtotal'],
-		body: tableMapperValues(sales?.cart, ['business', 'name', 'description', 'price', 'quantity', 'subtotal'])
+		body: tableMapperValues(sales?.cart, [
+			'business',
+			'name',
+			'description',
+			'price',
+			'quantity',
+			'subtotal'
+		])
 	};
 	let isReady: Boolean = false;
 	let paymentIndex: number;
@@ -66,8 +73,6 @@
 		},
 		timeout: 8000
 	};
-
-
 
 	// drawer settings
 	const drawerUpdate: DrawerSettings = {
@@ -164,7 +169,7 @@
 		type: 'button' | 'submit' | 'reset',
 		textContent: string,
 		index: number,
-		id: string,
+		id: string
 	) => {
 		const button = document.createElement('button');
 		button.type = type;
@@ -195,7 +200,7 @@
 			deleteButtons.forEach((input) => {
 				input.addEventListener('click', (event) => {
 					paymentIndex = event?.target?.dataset?.index;
-					toastStore.trigger(confirmPaymentDeletionSettings)
+					toastStore.trigger(confirmPaymentDeletionSettings);
 				});
 			});
 		}, 1000);
@@ -247,8 +252,6 @@
 		}
 	};
 
-	
-
 	onMount(async () => {
 		await loadData();
 	});
@@ -264,7 +267,9 @@
 			<div class="btn-group variant-filled overflow-auto">
 				<button type="button" on:click={() => drawerStore.open(drawerPayment)}>Add Payment</button>
 				<button type="button" on:click={() => drawerStore.open(drawerUpdate)}>Edit</button>
-				<button type="button" on:click={() => toastStore.trigger(confirmDeletionSettings)}>Delete</button>
+				<button type="button" on:click={() => toastStore.trigger(confirmDeletionSettings)}
+					>Delete</button
+				>
 				<button type="button" on:click={() => window.history.back()}>Close</button>
 			</div>
 		</div>

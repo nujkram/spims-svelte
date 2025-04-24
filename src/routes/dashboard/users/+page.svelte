@@ -133,12 +133,12 @@
 			<div class="placeholder animate-pulse w-full" />
 		</section>
 	{:else}
-	<section class="flex p-4 w-full gap-4">
-		<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
-			>Add User</button
-		>
-		<input class="input ml-auto" type="text" placeholder="Search" bind:value={keyword} />
-	</section>
+		<section class="flex p-4 w-full gap-4">
+			<button class="btn variant-filled-primary" on:click={() => drawerStore.open(drawerCreate)}
+				>Add User</button
+			>
+			<input class="input ml-auto" type="text" placeholder="Search" bind:value={keyword} />
+		</section>
 	{/if}
 </div>
 

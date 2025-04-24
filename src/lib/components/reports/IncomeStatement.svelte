@@ -3,10 +3,7 @@
 	import { Table, Paginator, tableMapperValues } from '@skeletonlabs/skeleton';
 	import type { PaginationSettings, TableSource } from '@skeletonlabs/skeleton';
 	import { Download } from '$lib/components/icons/index';
-	import {
-		formatCurrencyNoSymbol,
-		stringToDecimal
-	} from '$lib/utils/currencyHelper';
+	import { formatCurrencyNoSymbol, stringToDecimal } from '$lib/utils/currencyHelper';
 	export let salesSummary: any[];
 	export let expensesSummary: any[];
 
@@ -130,8 +127,7 @@
 				parseFloat(stringToDecimal(item.totalDownpayment)) +
 				parseFloat(stringToDecimal(item.totalPayments));
 			totalIncome =
-				parseFloat(stringToDecimal(totalSales)) -
-				parseFloat(stringToDecimal(item.totalExpenses));
+				parseFloat(stringToDecimal(totalSales)) - parseFloat(stringToDecimal(item.totalExpenses));
 
 			return {
 				...item,
@@ -157,7 +153,7 @@
 
 		csvContent += ',Date,Sales,Downpayment,Payment,Income,Balance,Expenses,Net Income\n';
 
-        sourceData.forEach((item: any) => {
+		sourceData.forEach((item: any) => {
 			// Convert numbers to strings and enclose fields with commas in double quotes
 			const row = [
 				item._id,
